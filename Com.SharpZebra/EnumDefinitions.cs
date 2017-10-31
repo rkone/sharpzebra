@@ -37,19 +37,6 @@ namespace Com.SharpZebra
         EMSIZE  //emsize is width of the an upper-case M in points.  1 point is 1.3333 pixels.  WPF assumes 96 pixels/inch. Confused yet?
     }
 
-    public class FontCharset
-    {
-        public static string[] CharList = {"0123456789.- ",
-            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
-            "abcdefghijklmnopqrstuvwxyz ",
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
-            "abcdefghijklmnopqrstuvwxyz 0123456789.-",
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789.-",
-            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" + 
-            "ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ² ",
-            "M"};
-    }
-
     public enum ZebraFont
     {
         STANDARD_SMALLEST = 48,
@@ -177,6 +164,40 @@ namespace Com.SharpZebra
         Sweden = 46,
         Swizerland = 41,
         UK = 44
+    }
+
+
+    public static class FontCharset
+    {
+        public static readonly string[] CharList = {"0123456789.- ",
+            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
+            "abcdefghijklmnopqrstuvwxyz ",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
+            "abcdefghijklmnopqrstuvwxyz 0123456789.-",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789.-",
+            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" + 
+            "ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ² ",
+            "M"};
+    }
+
+    public static class EPLConvert
+    {
+        public static int Rotation(ElementDrawRotation rotation)
+        {
+            switch (rotation)
+            {
+                case ElementDrawRotation.NO_ROTATION:
+                    return 0;
+                case ElementDrawRotation.ROTATE_90_DEGREES:
+                    return 1;
+                case ElementDrawRotation.ROTATE_180_DEGREES:
+                    return 2;
+                case ElementDrawRotation.ROTATE_270_DEGREES:
+                    return 4;
+                default:
+                    return 0;
+            }
+        }
     }
 
     public class Barcode

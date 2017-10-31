@@ -206,7 +206,7 @@ namespace Com.SharpZebra.Commands
                             k++;
                             if (k == 8)
                             {
-                                byte b = convertToByte(ba);
+                                byte b = ConvertToByte(ba);
                                 sendBytes.Add(b);
                                 k = 0;
 /*                                for (int x = 7; x > 0; x--)
@@ -246,7 +246,7 @@ namespace Com.SharpZebra.Commands
                             k++;
                             if (k == 8)
                             {
-                                byte b = convertToByte(ba);
+                                byte b = ConvertToByte(ba);
                                 sendBytes.Add(b);
                                 k = 0;
 /*                                for (int x = 7; x > 0; x--)
@@ -265,7 +265,7 @@ namespace Com.SharpZebra.Commands
             return sendBytes.ToArray();
         }        
 
-        private static byte convertToByte(BitArray bits)
+        private static byte ConvertToByte(BitArray bits)
         {
             byte value = 0x00;
 

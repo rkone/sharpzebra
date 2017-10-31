@@ -59,7 +59,7 @@ namespace Com.SharpZebra.Commands
                             ba[k] = bmp.GetPixel(scanx, y).R > 128;
                         scanx++;
                     }
-                    res.Add(convertToByte(ba));
+                    res.Add(ConvertToByte(ba));
                 }
             }
             return res.ToArray();

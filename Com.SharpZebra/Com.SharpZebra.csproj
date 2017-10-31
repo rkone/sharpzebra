@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.9.2</Version>
+    <Version>0.9.3</Version>
+    <PackageReleaseNotes>v 0.9.3: Fix EPL Rotation bug</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
