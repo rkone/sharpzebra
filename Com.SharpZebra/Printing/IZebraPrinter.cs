@@ -2,7 +2,7 @@ namespace Com.SharpZebra.Printing
 {
     public interface IZebraPrinter
     {
-        void Print(byte[] Data);
+        bool? Print(byte[] Data);
         PrinterSettings Settings { get; set; }     
     }
 

@@ -12,13 +12,14 @@ namespace Com.SharpZebra.Printing
             Settings = settings;
         }
 
-        public void Print(byte[] data)
+        public bool? Print(byte[] data)
         {
             Int32 dwCount;
             dwCount = data.Length;
             GCHandle h = GCHandle.Alloc(data, GCHandleType.Pinned);
-            SendBytesToPrinter(Settings.PrinterName, h.AddrOfPinnedObject(), dwCount);
-            h.Free();            
+            var res = SendBytesToPrinter(Settings.PrinterName, h.AddrOfPinnedObject(), dwCount);
+            h.Free();
+            return res;
         }
 
 

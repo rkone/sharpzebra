@@ -27,15 +27,12 @@
 #endregion License
 
 using System;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using Microsoft.Win32;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Text;
 
 namespace Com.SharpZebra.Printing
 {
@@ -48,36 +45,39 @@ namespace Com.SharpZebra.Printing
             Settings = settings;
         }
 
-        public void Print(byte[] data)
+        public bool? Print(byte[] data)
         {
             UsbPrinterConnector connector = new UsbPrinterConnector(Settings.PrinterName);
-            connector.BeginSend();          
-            connector.Send(data, 0, data.Length);
+            if (connector.BeginSend())
+            {
+                return connector.Send(data, 0, data.Length) == data.Length;
+            }
+            return false;
         }
     }
 
     public class UsbPrinterConnector
-    {
-        public static readonly int DefaultReadTimeout = 200;
-        public static readonly int DefaultWriteTimeout = 200;
-        private int readTimeout = DefaultReadTimeout;
+    {        
+        private const int DefaultReadTimeout = 200;
+        private const int DefaultWriteTimeout = 200;
+        private int _readTimeout = DefaultReadTimeout;
         public int ReadTimeout
         {
-            get { return readTimeout; }
-            set { readTimeout = value; }
+            get { return _readTimeout; }
+            set { _readTimeout = value; }
         }
 
-        private int writeTimeout = DefaultWriteTimeout;
+        private int _writeTimeout = DefaultWriteTimeout;
 
         public int WriteTimeout
         {
-            get { return writeTimeout; }
-            set { writeTimeout = value; }
+            get { return _writeTimeout; }
+            set { _writeTimeout = value; }
         }
 
         #region EnumDevices
 
-        static Guid GUID_DEVICEINTERFACE_USBPRINT = new Guid(
+        static Guid _guidDeviceinterfaceUsbprint = new Guid(
                 0x28d78fad, 0x5a12, 0x11D1,
                 0xae, 0x5b, 0x00, 0x00, 0xf8, 0x03, 0xa8, 0xc2);
         
@@ -114,29 +114,24 @@ namespace Com.SharpZebra.Printing
             try
             {
                 regKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\" +
-                    GUID_DEVICEINTERFACE_USBPRINT.ToString("B"));
+                    _guidDeviceinterfaceUsbprint.ToString("B"));
                 try
                 {
                     foreach (string sub in regKey.GetSubKeyNames())
                     {
-                        if (sub.Substring(0, 16).ToUpper() == "##?#USB#VID_0A5F")
-                        {
-                            subKey = Registry.LocalMachine.OpenSubKey(
-                                string.Format("SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\{0:B}\\{1}\\#",
-                                GUID_DEVICEINTERFACE_USBPRINT, sub));
-                            path = subKey.GetValue("SymbolicLink").ToString();
-                            subKey.Close();
+                        if (sub.Substring(0, 16).ToUpper() != "##?#USB#VID_0A5F") continue;
+                        //build NT object manager name for the device. Issues? Check with sysinternals WinObj program.
+                        path = sub.Replace("##?#", @"\\?\GLOBALROOT\GLOBAL??\");
 
-                            subKey = Registry.LocalMachine.OpenSubKey(
-                                string.Format("SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\{0:B}\\{1}\\#\\Device Parameters",
-                                GUID_DEVICEINTERFACE_USBPRINT, sub));                            
-                            if (int.TryParse(subKey.GetValue("Port Number").ToString(), out portNumber))
-                            {
-                                if (printerNames.ContainsKey(portNumber))
-                                    printers.Add(printerNames[portNumber], path);
-                            }
-                            subKey.Close();
+                        subKey = Registry.LocalMachine.OpenSubKey(
+                            string.Format("SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\{0:B}\\{1}\\#\\Device Parameters",
+                                _guidDeviceinterfaceUsbprint, sub));                            
+                        if (int.TryParse(subKey.GetValue("Port Number").ToString(), out portNumber))
+                        {
+                            if (printerNames.ContainsKey(portNumber))
+                                printers.Add(printerNames[portNumber], path);
                         }
+                        subKey.Close();
                     }
                 }
                 finally
@@ -153,7 +148,7 @@ namespace Com.SharpZebra.Printing
 
         #endregion EnumDevices
 
-        private string interfaceName;
+        private string _interfaceName;
 
         private IntPtr usbHandle = IntPtr.Zero;
 
@@ -171,7 +166,7 @@ namespace Com.SharpZebra.Printing
             
             Dictionary<string, string> plist = EnumDevices();
             if (plist.ContainsKey(PrinterName))
-                this.interfaceName = plist[PrinterName];
+                this._interfaceName = plist[PrinterName];
             else
                 throw new Exception("Cannot locate USB device");            
         }
@@ -203,7 +198,7 @@ namespace Com.SharpZebra.Printing
                 */
 
                 usbHandle = FileIO.CreateFile(
-                    interfaceName,
+                    _interfaceName,
                     FileIO.FileAccess.GENERIC_WRITE | FileIO.FileAccess.GENERIC_READ,
                     FileIO.FileShareMode.FILE_SHARE_READ,
                     IntPtr.Zero,
@@ -488,5 +483,4 @@ namespace Com.SharpZebra.Printing
         #endregion ReadFile
 
     }
-
 }

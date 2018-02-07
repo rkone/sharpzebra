@@ -15,7 +15,7 @@ namespace Com.SharpZebra.Printing
             Settings = settings;
         }
 
-        public void Print(byte[] data)
+        public bool? Print(byte[] data)
         {
             using (TcpClient printer = new TcpClient(Settings.PrinterName, Settings.PrinterPort))
             {
@@ -26,6 +26,7 @@ namespace Com.SharpZebra.Printing
                 }
                 printer.Close();
             }
+            return null;
         }
     }
 }

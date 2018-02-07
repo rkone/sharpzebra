@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Com.SharpZebra", "Com.SharpZebra\Com.SharpZebra.csproj", "{91E883C8-C218-42CF-A6AB-09861F1A3660}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Com.SharpZebra", "Com.SharpZebra\Com.SharpZebra.csproj", "{91E883C8-C218-42CF-A6AB-09861F1A3660}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPrinter", "TestPrinter\TestPrinter.csproj", "{337BA460-7A6C-4252-BD72-6FEEF7E222B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{91E883C8-C218-42CF-A6AB-09861F1A3660}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91E883C8-C218-42CF-A6AB-09861F1A3660}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91E883C8-C218-42CF-A6AB-09861F1A3660}.Release|Any CPU.Build.0 = Release|Any CPU
+		{337BA460-7A6C-4252-BD72-6FEEF7E222B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{337BA460-7A6C-4252-BD72-6FEEF7E222B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{337BA460-7A6C-4252-BD72-6FEEF7E222B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{337BA460-7A6C-4252-BD72-6FEEF7E222B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {772012DD-5A79-4BBD-896F-2FB637C78936}
 	EndGlobalSection
 EndGlobal

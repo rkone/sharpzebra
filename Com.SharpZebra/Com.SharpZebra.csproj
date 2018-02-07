@@ -5,6 +5,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.9.3</Version>
     <PackageReleaseNotes>v 0.9.3: Fix EPL Rotation bug</PackageReleaseNotes>
+    <PackageId>SharpZebra.rkone</PackageId>
+    <Authors>rkone</Authors>
+    <Company>SharpZebra</Company>
+    <Product>SharpZebra</Product>
+    <Description>A .net library that simplifies printing to Zebra printers in their native EPL2/ZPL languages without needing to know EPL2 or ZPL.</Description>
+    <PackageTags>Barcode Zebra Label</PackageTags>
+    <Copyright>Copyright 2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
