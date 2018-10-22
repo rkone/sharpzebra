@@ -12,6 +12,9 @@
     <Description>A .net library that simplifies printing to Zebra printers in their native EPL2/ZPL languages without needing to know EPL2 or ZPL.</Description>
     <PackageTags>Barcode Zebra Label</PackageTags>
     <Copyright>Copyright 2017</Copyright>
+  </PropertyGroup>  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\net452\Com.SharpZebra.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
