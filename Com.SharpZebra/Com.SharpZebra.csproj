@@ -3,16 +3,18 @@
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.9.4</Version>
-    <PackageReleaseNotes>v 0.9.5: Added DataMatrix barcode</PackageReleaseNotes>
+    <Version>1.0.0</Version>
+    <PackageReleaseNotes>v1.0.0: Added DataMatrix barcode
+</PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
-    <Authors>MyCompany</Authors>
-    <Company>SharpZebra</Company>
+    <Authors>rkone</Authors>
+    <Company>rkone</Company>
     <Product>SharpZebra</Product>
-    <Description>Com.SharpZebra</Description>
-    <PackageTags>Barcode Zebra Label</PackageTags>
+    <Description>A .net library that simplifies printing to Zebra printers in their native EPL2/ZPL languages without needing to know EPL2 or ZPL.  
+NEW: Check out SharpZebraStandard - a NetStandard2.0 version for those using only networked label printers.</Description>
+    <PackageTags>Barcode Zebra Label Printer</PackageTags>
     <Copyright>Copyright 2018</Copyright>
-    <PackageVersion>0.9.5</PackageVersion>
+    <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
