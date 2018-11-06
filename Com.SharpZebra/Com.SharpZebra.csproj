@@ -4,14 +4,15 @@
     <TargetFramework>net452</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.9.4</Version>
-    <PackageReleaseNotes>v 0.9.4: Win10 USB printer fix. Print returns bool? EPLCommands accept codepage</PackageReleaseNotes>
-    <PackageId>SharpZebra.rkone</PackageId>
-    <Authors>rkone</Authors>
+    <PackageReleaseNotes>v 0.9.5: Added DataMatrix barcode</PackageReleaseNotes>
+    <PackageId>Com.SharpZebra</PackageId>
+    <Authors>MyCompany</Authors>
     <Company>SharpZebra</Company>
     <Product>SharpZebra</Product>
-    <Description>A .net library that simplifies printing to Zebra printers in their native EPL2/ZPL languages without needing to know EPL2 or ZPL.</Description>
+    <Description>Com.SharpZebra</Description>
     <PackageTags>Barcode Zebra Label</PackageTags>
     <Copyright>Copyright 2018</Copyright>
+    <PackageVersion>0.9.5</PackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
