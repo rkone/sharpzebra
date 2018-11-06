@@ -122,7 +122,7 @@ namespace Com.SharpZebra.Commands
             _stringCounter++;
             var name = $"SZT{_stringCounter:00000}";
             var res = new List<byte>();
-            var drive = _printerSettings?.RamDrive ?? ramDrive ?? 'R';
+            var drive = ramDrive ?? _printerSettings?.RamDrive ?? 'R';
             res.AddRange(GraphicStore(customString.CustomImage, drive, name));
             res.AddRange(GraphicWrite(left, top, name, drive));
             return res.ToArray();

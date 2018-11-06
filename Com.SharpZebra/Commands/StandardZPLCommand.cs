@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Com.SharpZebra.Commands
@@ -76,7 +75,9 @@ namespace Com.SharpZebra.Commands
 
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
-            writer.Write(textCommand.Take(textCommand.Length-3).ToArray()); //strip ^FS from given command
+            byte[] cmd = new byte[textCommand.Length - 3];
+            Array.Copy(textCommand, cmd, textCommand.Length-3);
+            writer.Write(cmd); //strip ^FS from given command
             var s = string.Format("^FB{0},{1},{2},{3},{4}^FS", width, maxLines, lineSpacing, (char)alignment, indentSize);
             writer.Write(Encoding.GetEncoding(codepage).GetBytes(s));
             return stream.ToArray();

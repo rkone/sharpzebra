@@ -28,7 +28,7 @@ namespace Com.SharpZebra.Commands
 
         public static byte[] GraphicStore(string pcxFilename, string imageName)
         {
-            FileStream stream = new FileStream(pcxFilename, FileMode.Open, FileAccess.Read);
+            FileStream stream = new FileStream(pcxFilename, FileMode.Open);
             byte[] res = GraphicStore(stream, imageName);
             stream.Close();
             return res;
