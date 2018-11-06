@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Com.SharpZebra.Commands
@@ -13,9 +14,9 @@ namespace Com.SharpZebra.Commands
             //^XA^MMT^PR4,12,12~TA000^LS-20^LH0,12~SD19^PW750
             _stringCounter = 0;
             _printerSettings = settings;
-            return Encoding.GetEncoding(850).GetBytes(string.Format("^XA^MMT^PR{0},12,12~TA{1:000}^LH{2},{3}~SD{4:00}^PW{5}", settings.PrintSpeed, 
-                settings.AlignTearOff, settings.AlignLeft, settings.AlignTop, settings.Darkness, settings.Width+settings.AlignLeft));
-        }        
+            return Encoding.GetEncoding(850).GetBytes(string.Format("^XA^MMT^PR{0},12,12~TA{1:000}^LH{2},{3}~SD{4:00}^PW{5}", settings.PrintSpeed,
+                settings.AlignTearOff, settings.AlignLeft, settings.AlignTop, settings.Darkness, settings.Width + settings.AlignLeft));
+        }
 
         public static byte[] PrintBuffer(int copies)
         {
@@ -26,9 +27,9 @@ namespace Com.SharpZebra.Commands
         {
             var encodedReadable = readable ? "Y" : "N";
             switch (barcode.Type)
-	        {
+            {
                 case BarcodeType.CODE39_STD_EXT:
-                    return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^BY{2}^B3{3},,{4},{5}^FD{6}^FS", left, top, 
+                    return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^BY{2}^B3{3},,{4},{5}^FD{6}^FS", left, top,
                         barcode.BarWidthNarrow, (char)rotation, height, encodedReadable, barcodeData));
                 case BarcodeType.CODE128_AUTO:
                     return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^BY{2}^BC{3},{4},{5}^FD{6}^FS", left, top,
@@ -39,9 +40,31 @@ namespace Com.SharpZebra.Commands
                 case BarcodeType.EAN13:
                     return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^BY{2}^BE{3},{4},{5}^FD{6}^FS", left, top,
                         barcode.BarWidthNarrow, (char)rotation, height, encodedReadable, barcodeData));
-		        default:
-                    throw new ApplicationException("Barcode not yet supported by SharpZebra library.");                
-	        }
+                default:
+                    throw new ApplicationException("Barcode not yet supported by SharpZebra library.");
+            }
+        }
+
+        /// <summary>
+        /// Writes Data Matrix Bar Code for ZPL. 
+        /// ZPL Command: ^BX.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=122"/>     
+        /// </summary>
+        /// <param name="left">Horizontal axis.</param>
+        /// <param name="top">Vertical axis.</param>
+        /// <param name="height">Height is determined by dimension and data that is encoded.</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="text">Text to be encoded</param>                            
+        /// <param name="qualityLevel">Version of Data Matrix.</param>
+        /// <param name="aspectRatio">Choices the symbol, it is possible encode the same data in two forms of Data Matrix, a square form or rectangular.</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] DataMatrixWrite(int left, int top, ElementDrawRotation rotation, int height, string text, QualityLevel qualityLevel = QualityLevel.ECC_200, AspectRatio aspectRatio = AspectRatio.SQUARE)
+        {
+            var rotationValue = (char)rotation;
+            var qualityLevelValue = (int)qualityLevel;
+            var aspectRatioValue = (int)aspectRatio;
+
+            return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BX{rotationValue}, {height},{qualityLevelValue},,,,,{aspectRatioValue},^FD{text}^FS");
         }
 
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font, int height, int width, string text, int codepage = 850)
@@ -51,7 +74,7 @@ namespace Com.SharpZebra.Commands
 
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, string fontName, char storageArea, int height, string text, int codepage = 850)
         {
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}^FD{6}^FS",(char)rotation, height, storageArea, fontName, left, top, text));
+            return Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}^FD{6}^FS", (char)rotation, height, storageArea, fontName, left, top, text));
         }
 
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, int height, string text, int codepage = 850)
@@ -65,7 +88,7 @@ namespace Com.SharpZebra.Commands
             return TextAlign(width, alignment, 1, 0, 0, textCommand);
         }
 
-        public static byte[] TextAlign (int width, Alignment alignment, int maxLines, int lineSpacing, int indentSize, byte[] textCommand, int codepage = 850)
+        public static byte[] TextAlign(int width, Alignment alignment, int maxLines, int lineSpacing, int indentSize, byte[] textCommand, int codepage = 850)
         {
             //limits from ZPL Manual:
             //width [0,9999]
@@ -75,9 +98,7 @@ namespace Com.SharpZebra.Commands
 
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
-            byte[] cmd = new byte[textCommand.Length - 3];
-            Array.Copy(textCommand, cmd, textCommand.Length-3);
-            writer.Write(cmd); //strip ^FS from given command
+            writer.Write(textCommand.Take(textCommand.Length - 3).ToArray()); //strip ^FS from given command
             var s = string.Format("^FB{0},{1},{2},{3},{4}^FS", width, maxLines, lineSpacing, (char)alignment, indentSize);
             writer.Write(Encoding.GetEncoding(codepage).GetBytes(s));
             return stream.ToArray();
@@ -85,8 +106,8 @@ namespace Com.SharpZebra.Commands
 
         public static byte[] LineWrite(int left, int top, int lineThickness, int right, int bottom)
         {
-            var height = top-bottom;
-            var width = right - left;            
+            var height = top - bottom;
+            var width = right - left;
             var diagonal = height * width < 0 ? 'L' : 'R';
             var l = Math.Min(left, right);
             var t = Math.Min(top, bottom);
@@ -95,17 +116,17 @@ namespace Com.SharpZebra.Commands
 
             //zpl requires that straight lines are drawn with GB (Graphic-Box)
             if (width < lineThickness)
-                return BoxWrite(left-((int)(lineThickness/2)), top, lineThickness, width, height, 0);
+                return BoxWrite(left - ((int)(lineThickness / 2)), top, lineThickness, width, height, 0);
             if (height < lineThickness)
-                return BoxWrite(left, top-((int)(lineThickness/2)), lineThickness, width, height, 0);
-            
-            return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^GD{2},{3},{4},{5},{6}^FS", l, t, width, height, 
+                return BoxWrite(left, top - ((int)(lineThickness / 2)), lineThickness, width, height, 0);
+
+            return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^GD{2},{3},{4},{5},{6}^FS", l, t, width, height,
                     lineThickness, "", diagonal));
         }
 
         public static byte[] BoxWrite(int left, int top, int lineThickness, int width, int height, int rounding)
         {
-            return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^GB{2},{3},{4},{5},{6}^FS", left, top, 
+            return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^GB{2},{3},{4},{5},{6}^FS", left, top,
                 Math.Max(width, lineThickness), Math.Max(height, lineThickness), lineThickness, "", rounding));
         }
         /*

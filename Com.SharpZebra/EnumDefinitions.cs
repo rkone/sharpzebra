@@ -166,6 +166,20 @@ namespace Com.SharpZebra
         UK = 44
     }
 
+    public enum QualityLevel
+    {
+        ECC_50 = 50,
+        ECC_80 = 80,
+        ECC_100 = 100,
+        ECC_140 = 140,
+        ECC_200 = 200,
+    }
+
+    public enum AspectRatio
+    {
+        SQUARE = 1,
+        RECTANGULAR = 2
+    }
 
     public static class FontCharset
     {
@@ -175,7 +189,7 @@ namespace Com.SharpZebra
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ ",
             "abcdefghijklmnopqrstuvwxyz 0123456789.-",
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789.-",
-            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" + 
+            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~" +
             "ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ² ",
             "M"};
     }
@@ -203,12 +217,12 @@ namespace Com.SharpZebra
     public class Barcode
     {
         private BarcodeType type;
-        public BarcodeType Type 
+        public BarcodeType Type
         {
-            get {return type;}
+            get { return type; }
             set
             {
-                type = value; 
+                type = value;
                 P4Value = P4ValueList[(int)type];
                 BarWidthNarrowMin = P5MinList[(int)type];
                 BarWidthNarrowMax = P5MaxList[(int)type];
