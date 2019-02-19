@@ -6,6 +6,8 @@
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
     <Version>1.0.1</Version>
+    <PackageReleaseNotes>v1.0.1: Separated ZebraFont to EPLFont and ZPLFont. BREAKING: Changed namespace to be simply SharpZebra.</PackageReleaseNotes>
+    <RootNamespace>SharpZebra</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

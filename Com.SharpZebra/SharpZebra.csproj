@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net20</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
-    <PackageReleaseNotes>v1.0.0: Added DataMatrix barcode
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>v1.0.1: Reverted back to .Net 2.0 from 4.5.2.  Separated ZebraFont to EPLFont and ZPLFont. BREAKING: Cleaned namespace to simply be SharpZebra. 
 </PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
     <Authors>rkone</Authors>
@@ -13,7 +13,7 @@
     <Description>A .net library that simplifies printing to Zebra printers in their native EPL2/ZPL languages without needing to know EPL2 or ZPL.  
 NEW: Check out SharpZebraStandard - a NetStandard2.0 version for those using only networked label printers.</Description>
     <PackageTags>Barcode Zebra Label Printer</PackageTags>
-    <Copyright>Copyright 2018</Copyright>
+    <Copyright>Copyright 2019</Copyright>
     <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
   <ItemGroup>
