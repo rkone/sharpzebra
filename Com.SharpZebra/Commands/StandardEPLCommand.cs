@@ -1,10 +1,9 @@
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Text;
-using Com.SharpZebra.Printing;
+using SharpZebra.Printing;
 
-namespace Com.SharpZebra.Commands
+namespace SharpZebra.Commands
 {
     public partial class EPLCommands
     {
@@ -28,12 +27,22 @@ namespace Com.SharpZebra.Commands
                 barcodeData));
         }
 
+        [Obsolete("Use EPLFont instead of ZebraFont.")]
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font,
                                                 int horizontalMult, int verticalMult, bool isReverse, string text, PrinterSettings settings, int codepage = 437)
         {
             return Encoding.GetEncoding(codepage).GetBytes(string.Format("A{0},{1},{2},{3},{4},{5},{6},\"{7}\"\n",
                 left + settings.AlignLeft,
                 top + settings.AlignTop, EPLConvert.Rotation(rotation), (char) font, horizontalMult, verticalMult,
+                isReverse ? "R" : "N", text.Replace(@"\", @"\\").Replace("\"", "\\\"")));
+        }
+
+        public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, EPLFont font,
+            int horizontalMult, int verticalMult, bool isReverse, string text, PrinterSettings settings, int codepage = 437)
+        {
+            return Encoding.GetEncoding(codepage).GetBytes(string.Format("A{0},{1},{2},{3},{4},{5},{6},\"{7}\"\n",
+                left + settings.AlignLeft,
+                top + settings.AlignTop, EPLConvert.Rotation(rotation), (char)font, horizontalMult, verticalMult,
                 isReverse ? "R" : "N", text.Replace(@"\", @"\\").Replace("\"", "\\\"")));
         }
 
@@ -99,26 +108,26 @@ namespace Com.SharpZebra.Commands
         {
             var res = new List<byte>();
             res.AddRange(LineWriteBlack(0, 20, 1, 20, p, codepage));
-            res.AddRange(TextWrite(5, 20, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "0", p, codepage));
+            res.AddRange(TextWrite(5, 20, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "0", p, codepage));
             res.AddRange(LineWriteBlack(5, 40, 1, 20, p, codepage));
-            res.AddRange(TextWrite(10, 40, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "5", p, codepage));
+            res.AddRange(TextWrite(10, 40, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "5", p, codepage));
             res.AddRange(LineWriteBlack(10, 60, 1, 20, p, codepage));
-            res.AddRange(TextWrite(15, 60, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "10", p, codepage));
+            res.AddRange(TextWrite(15, 60, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "10", p, codepage));
             res.AddRange(LineWriteBlack(15, 80, 1, 20, p, codepage));
-            res.AddRange(TextWrite(20, 80, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "15", p, codepage));
+            res.AddRange(TextWrite(20, 80, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "15", p, codepage));
             res.AddRange(LineWriteBlack(20, 100, 1, 20, p, codepage));
-            res.AddRange(TextWrite(25, 100, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "20", p, codepage));
+            res.AddRange(TextWrite(25, 100, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "20", p, codepage));
 
             res.AddRange(LineWriteBlack(40, 0, 20, 1, p, codepage));
-            res.AddRange(TextWrite(40, 5, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "0", p, codepage));
+            res.AddRange(TextWrite(40, 5, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "0", p, codepage));
             res.AddRange(LineWriteBlack(60, 5, 20, 1, p, codepage));
-            res.AddRange(TextWrite(60, 10, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "5", p, codepage));
+            res.AddRange(TextWrite(60, 10, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "5", p, codepage));
             res.AddRange(LineWriteBlack(80, 10, 20, 1, p, codepage));
-            res.AddRange(TextWrite(80, 15, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "10", p, codepage));
+            res.AddRange(TextWrite(80, 15, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "10", p, codepage));
             res.AddRange(LineWriteBlack(100, 15, 20, 1, p, codepage));
-            res.AddRange(TextWrite(100, 20, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "15", p, codepage));
+            res.AddRange(TextWrite(100, 20, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "15", p, codepage));
             res.AddRange(LineWriteBlack(120, 20, 20, 1, p, codepage));
-            res.AddRange(TextWrite(120, 25, ElementDrawRotation.NO_ROTATION, ZebraFont.STANDARD_NORMAL, 1, 1, false, "20", p, codepage));
+            res.AddRange(TextWrite(120, 25, ElementDrawRotation.NO_ROTATION, EPLFont.STANDARD_NORMAL, 1, 1, false, "20", p, codepage));
 
             res.AddRange(LineWriteBlack(p.Width, 20, 1, 20, p, codepage));
             res.AddRange(LineWriteBlack(p.Width - 5, 40, 1, 20, p, codepage));

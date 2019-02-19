@@ -1,14 +1,14 @@
-namespace Com.SharpZebra.Printing
+namespace SharpZebra.Printing
 {
     public interface IZebraPrinter
     {
-        bool? Print(byte[] Data);
+        bool? Print(byte[] data);
         PrinterSettings Settings { get; set; }     
     }
 
     public class PrinterSettings
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public char PrinterType { get; set; }
         public string PrinterName { get; set; }
         public int PrinterPort { get; set; }

@@ -32,11 +32,10 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
-using System.Text;
 
-namespace Com.SharpZebra.Printing
+namespace SharpZebra.Printing
 {
-    public class USBPrinter: IZebraPrinter
+    public class USBPrinter : IZebraPrinter
     {
         public PrinterSettings Settings { get; set; }
 
@@ -47,7 +46,7 @@ namespace Com.SharpZebra.Printing
 
         public bool? Print(byte[] data)
         {
-            UsbPrinterConnector connector = new UsbPrinterConnector(Settings.PrinterName);
+            var connector = new UsbPrinterConnector(Settings.PrinterName);
             if (connector.BeginSend())
             {
                 return connector.Send(data, 0, data.Length) == data.Length;
@@ -57,118 +56,90 @@ namespace Com.SharpZebra.Printing
     }
 
     public class UsbPrinterConnector
-    {        
+    {
         private const int DefaultReadTimeout = 200;
         private const int DefaultWriteTimeout = 200;
-        private int _readTimeout = DefaultReadTimeout;
-        public int ReadTimeout
-        {
-            get { return _readTimeout; }
-            set { _readTimeout = value; }
-        }
-
-        private int _writeTimeout = DefaultWriteTimeout;
-
-        public int WriteTimeout
-        {
-            get { return _writeTimeout; }
-            set { _writeTimeout = value; }
-        }
+        public int ReadTimeout { get; set; } = DefaultReadTimeout;
+        public int WriteTimeout { get; set; } = DefaultWriteTimeout;
 
         #region EnumDevices
 
-        static Guid _guidDeviceinterfaceUsbprint = new Guid(
+        private static readonly Guid GuidDeviceInterfaceUsbPrint = new Guid(
                 0x28d78fad, 0x5a12, 0x11D1,
                 0xae, 0x5b, 0x00, 0x00, 0xf8, 0x03, 0xa8, 0xc2);
-        
-        public static Dictionary<string, string> EnumDevices()
-        {
-            RegistryKey regKey, subKey;
-            string portValue, path;
-            int portNumber;
-            Dictionary<string, string> printers = new Dictionary<string, string>();
-            Dictionary<int, string> printerNames = new Dictionary<int, string>();
-            try
-            {
-                RegistryKey nameKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Print\\Printers");
-                foreach (string printer in nameKey.GetSubKeyNames())
-                {
-                    subKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Print\\Printers\\" + printer);
-                    portValue = subKey.GetValue("Port").ToString();
-                    if (portValue.Substring(0, 3) == "USB")
-                    {
-                        if (int.TryParse(portValue.Substring(3, portValue.Length - 3), out portNumber))
-                        {
-                            if (!printerNames.ContainsKey(portNumber))
-                                printerNames.Add(portNumber, printer);
-                        }
-                    }
-                    subKey.Close();
-                }
-                nameKey.Close();
-            }
-            catch
-            {
-                //do nothing (no printers?)
-            }
-            try
-            {
-                regKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\" +
-                    _guidDeviceinterfaceUsbprint.ToString("B"));
-                try
-                {
-                    foreach (string sub in regKey.GetSubKeyNames())
-                    {
-                        if (sub.Substring(0, 16).ToUpper() != "##?#USB#VID_0A5F") continue;
-                        //build NT object manager name for the device. Issues? Check with sysinternals WinObj program.
-                        path = sub.Replace("##?#", @"\\?\GLOBALROOT\GLOBAL??\");
 
-                        subKey = Registry.LocalMachine.OpenSubKey(
-                            string.Format("SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\{0:B}\\{1}\\#\\Device Parameters",
-                                _guidDeviceinterfaceUsbprint, sub));                            
-                        if (int.TryParse(subKey.GetValue("Port Number").ToString(), out portNumber))
-                        {
-                            if (printerNames.ContainsKey(portNumber))
-                                printers.Add(printerNames[portNumber], path);
-                        }
-                        subKey.Close();
+        private static Dictionary<string, string> EnumDevices()
+        {
+            RegistryKey subKey;
+            int portNumber;
+            var printers = new Dictionary<string, string>();
+            var printerNames = new Dictionary<int, string>();
+            var nameKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Print\\Printers");
+            if (nameKey == null) throw new ApplicationException("Windows Compatibility issue: Missing Printer registry keys");
+            foreach (var printer in nameKey.GetSubKeyNames())
+            {
+                subKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Print\\Printers\\" + printer);
+                if (subKey == null) continue;
+                var portValue = subKey.GetValue("Port").ToString();
+                if (portValue.Substring(0, 3) == "USB")
+                {
+                    if (int.TryParse(portValue.Substring(3, portValue.Length - 3), out portNumber))
+                    {
+                        if (!printerNames.ContainsKey(portNumber))
+                            printerNames.Add(portNumber, printer);
                     }
                 }
-                finally
-                {
-                    regKey.Close();
-                }
+                subKey.Close();
             }
-            catch
+            nameKey.Close();
+
+            var regKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\" +
+                                                          GuidDeviceInterfaceUsbPrint.ToString("B"));
+            if (regKey == null) return printers;
+            foreach (var sub in regKey.GetSubKeyNames())
             {
-                // do nothing
+                if (sub.Substring(0, 16).ToUpper() != "##?#USB#VID_0A5F") continue;
+                //build NT object manager name for the device. Issues? Check with sysinternals WinObj program.
+                var path = sub.Replace("##?#", @"\\?\GLOBALROOT\GLOBAL??\");
+
+                subKey = Registry.LocalMachine.OpenSubKey(
+                    $"SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\{GuidDeviceInterfaceUsbPrint:B}\\{sub}\\#\\Device Parameters");
+                if (subKey == null) continue;
+                if (int.TryParse(subKey.GetValue("Port Number").ToString(), out portNumber))
+                {
+                    if (printerNames.ContainsKey(portNumber))
+                        printers.Add(printerNames[portNumber], path);
+                }
+
+                subKey.Close();
             }
+            regKey.Close();
+
             return printers;
         }
 
         #endregion EnumDevices
 
-        private string _interfaceName;
+        private readonly string _interfaceName;
 
-        private IntPtr usbHandle = IntPtr.Zero;
+        private IntPtr _usbHandle = IntPtr.Zero;
 
-        public static readonly uint ReadBufferSize = 512;
+        private const uint ReadBufferSize = 512;
 
-        private byte[] readBuffer;
+        private byte[] _readBuffer;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="InterfaceName"></param>
-        public UsbPrinterConnector(string PrinterName)
-            : base()
+        /// <param name="printerName">The name of the printer to print to</param>
+        public UsbPrinterConnector(string printerName)
         {
-            
-            Dictionary<string, string> plist = EnumDevices();
-            if (plist.ContainsKey(PrinterName))
-                this._interfaceName = plist[PrinterName];
+
+            var plist = EnumDevices();
+            if (plist.ContainsKey(printerName))
+                _interfaceName = plist[printerName];
             else
-                throw new Exception("Cannot locate USB device");            
+                throw new Exception("Cannot locate USB device");
         }
 
         /// <summary>
@@ -179,16 +150,16 @@ namespace Com.SharpZebra.Printing
             SetConnected(false);
         }
 
-        protected void SetConnected(bool value)
+        private void SetConnected(bool value)
         {
             if (value)
             {
-                if ((int)usbHandle > 0)
+                if ((int)_usbHandle > 0)
                     SetConnected(false);
 
                 /* C++ Decl.
                 usbHandle = CreateFile(
-                    interfacename, 
+                    interfaceName, 
                     GENERIC_WRITE, 
                     FILE_SHARE_READ,
                     NULL, 
@@ -197,7 +168,7 @@ namespace Com.SharpZebra.Printing
                     NULL);
                 */
 
-                usbHandle = FileIO.CreateFile(
+                _usbHandle = FileIO.CreateFile(
                     _interfaceName,
                     FileIO.FileAccess.GENERIC_WRITE | FileIO.FileAccess.GENERIC_READ,
                     FileIO.FileShareMode.FILE_SHARE_READ,
@@ -207,28 +178,28 @@ namespace Com.SharpZebra.Printing
                         FileIO.FileAttributes.FILE_FLAG_SEQUENTIAL_SCAN |
                         FileIO.FileAttributes.FILE_FLAG_OVERLAPPED,
                     IntPtr.Zero);
-                if ((int)usbHandle <= 0)
+                if ((int)_usbHandle <= 0)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
             }
             else
-                if ((int)usbHandle > 0)
-                {
-                    FileIO.CloseHandle(usbHandle);
-                    usbHandle = IntPtr.Zero;
-                }
+                if ((int)_usbHandle > 0)
+            {
+                FileIO.CloseHandle(_usbHandle);
+                _usbHandle = IntPtr.Zero;
+            }
         }
 
-        protected bool GetConnected()
+        private bool GetConnected()
         {
             try
             {
                 SetConnected(true);
-                return ((int)usbHandle > 0);
+                return ((int)_usbHandle > 0);
             }
             catch (Win32Exception)  //printer is not online
             {
                 return false;
-            }            
+            }
         }
 
         public bool BeginSend()
@@ -239,76 +210,71 @@ namespace Com.SharpZebra.Printing
         public int Send(byte[] buffer, int offset, int count)
         {
             // USB 1.1 WriteFile maximum block size is 4096
-            uint size;
-            byte[] bytes;
 
             if (!GetConnected())
                 throw new ApplicationException("Not connected");
 
             if (count > 4096)
             {
-                int current = 0;
-                int total = 0;
+                var current = 0;
+                var total = 0;
                 while (current < count)
                 {
-                    int newcount = current + 4096 > count ? count - current : 4096;
-                    total += Send(buffer, current, newcount);
+                    var newCount = current + 4096 > count ? count - current : 4096;
+                    total += Send(buffer, current, newCount);
                     current += 4096;
                 }
                 return total;
-                //throw new NotImplementedException();  // TODO: Copy byte array loop
             }
-            else
-            {
-                bytes = new byte[count];
-                Array.Copy(buffer, offset, bytes, 0, count);
-                ManualResetEvent wo = new ManualResetEvent(false);
-                NativeOverlapped ov = new NativeOverlapped();
-                // ov.OffsetLow = 0; ov.OffsetHigh = 0;
-                ov.EventHandle = wo.SafeWaitHandle.DangerousGetHandle();
-                if (!FileIO.WriteFile(usbHandle, bytes, (uint)count, out size, ref ov))
-                {
-                    if (Marshal.GetLastWin32Error() == FileIO.ERROR_IO_PENDING)
-                        wo.WaitOne(WriteTimeout, false);
-                    else
-                        throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
 
-                FileIO.GetOverlappedResult(usbHandle, ref ov, out size, true);
-                return (int)size;
+            var bytes = new byte[count];
+            Array.Copy(buffer, offset, bytes, 0, count);
+            var wo = new ManualResetEvent(false);
+            var ov = new NativeOverlapped { EventHandle = wo.SafeWaitHandle.DangerousGetHandle() };
+            // ov.OffsetLow = 0; ov.OffsetHigh = 0;
+            if (!FileIO.WriteFile(_usbHandle, bytes, (uint)count, out var size, ref ov))
+            {
+                if (Marshal.GetLastWin32Error() == FileIO.ERROR_IO_PENDING)
+                    wo.WaitOne(WriteTimeout, false);
+                else
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
             }
+
+            FileIO.GetOverlappedResult(_usbHandle, ref ov, out size, true);
+            return (int)size;
         }
 
         public int Read(out byte[] buffer)
         {
             // USB 1.1 ReadFile in block chunks of 64 bytes
             // USB 2.0 ReadFile in block chunks of 512 bytes
-            uint read;
 
-            if (readBuffer == null)
-                readBuffer = new byte[ReadBufferSize];
+            if (_readBuffer == null)
+                _readBuffer = new byte[ReadBufferSize];
 
-            AutoResetEvent sg = new AutoResetEvent(false);
-            NativeOverlapped ov = new NativeOverlapped();
-            ov.OffsetLow = 0;
-            ov.OffsetHigh = 0;
-            ov.EventHandle = sg.SafeWaitHandle.DangerousGetHandle();
+            var sg = new AutoResetEvent(false);
+            var ov = new NativeOverlapped
+            {
+                OffsetLow = 0,
+                OffsetHigh = 0,
+                EventHandle = sg.SafeWaitHandle.DangerousGetHandle()
+            };
 
-            if (!FileIO.ReadFile(usbHandle, readBuffer, ReadBufferSize, out read, ref ov))
+            if (!FileIO.ReadFile(_usbHandle, _readBuffer, ReadBufferSize, out var read, ref ov))
             {
                 if (Marshal.GetLastWin32Error() == FileIO.ERROR_IO_PENDING)
                     sg.WaitOne(ReadTimeout, false);
                 else
                     throw new Win32Exception(Marshal.GetLastWin32Error());
             }
-            FileIO.GetOverlappedResult(usbHandle, ref ov, out read, true);
+            FileIO.GetOverlappedResult(_usbHandle, ref ov, out read, true);
             buffer = new byte[read];
-            Array.Copy(readBuffer, buffer, read);
+            Array.Copy(_readBuffer, buffer, read);
             return (int)read;
         }
     }
-        
-    
+
+
     internal class FileIO
     {
 

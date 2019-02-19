@@ -2,10 +2,10 @@ using System.IO;
 using System.Drawing;
 using System.Text;
 using System.Collections;
-using Com.SharpZebra.Printing;
+using SharpZebra.Printing;
 using System.Collections.Generic;
 
-namespace Com.SharpZebra.Commands
+namespace SharpZebra.Commands
 {
     public partial class EPLCommands
     {

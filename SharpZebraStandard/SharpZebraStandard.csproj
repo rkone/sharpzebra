@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>rkone</Authors>
+    <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Com.SharpZebra\Commands\CustomFontEPLCommand.cs" Link="Commands\CustomFontEPLCommand.cs" />
+    <Compile Include="..\Com.SharpZebra\Commands\GraphicEPLCommand.cs" Link="Commands\GraphicEPLCommand.cs" />
+    <Compile Include="..\Com.SharpZebra\Commands\GraphicZPLCommand.cs" Link="Commands\GraphicZPLCommand.cs" />
+    <Compile Include="..\Com.SharpZebra\Commands\StandardEPLCommand.cs" Link="Commands\StandardEPLCommand.cs" />
+    <Compile Include="..\Com.SharpZebra\Commands\StandardZPLCommand.cs" Link="Commands\StandardZPLCommand.cs" />
+    <Compile Include="..\Com.SharpZebra\EnumDefinitions.cs" Link="EnumDefinitions.cs" />
+    <Compile Include="..\Com.SharpZebra\Printing\IZebraPrinter.cs" Link="Printing\IZebraPrinter.cs" />
+    <Compile Include="..\Com.SharpZebra\Printing\NetworkPrinter.cs" Link="Printing\NetworkPrinter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\" />
+    <Folder Include="Printing\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
+  </ItemGroup>
+
+</Project>

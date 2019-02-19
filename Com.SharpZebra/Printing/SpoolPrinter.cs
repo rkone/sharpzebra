@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Com.SharpZebra.Printing
+namespace SharpZebra.Printing
 {
     public class SpoolPrinter: IZebraPrinter
     {
@@ -14,16 +14,14 @@ namespace Com.SharpZebra.Printing
 
         public bool? Print(byte[] data)
         {
-            Int32 dwCount;
-            dwCount = data.Length;
-            GCHandle h = GCHandle.Alloc(data, GCHandleType.Pinned);
-            var res = SendBytesToPrinter(Settings.PrinterName, h.AddrOfPinnedObject(), dwCount);
+            var h = GCHandle.Alloc(data, GCHandleType.Pinned);
+            var res = SendBytesToPrinter(Settings.PrinterName, h.AddrOfPinnedObject(), data.Length);
             h.Free();
             return res;
         }
 
 
-        // Structure and API declarions:
+        // Structure and API declarations:
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public class DOCINFOA
         {
@@ -59,36 +57,31 @@ namespace Com.SharpZebra.Printing
         // When the function is given a printer name and an unmanaged array
         // of bytes, the function sends those bytes to the print queue.
         // Returns true on success, false on failure.
-        private static bool SendBytesToPrinter(string szPrinterName, IntPtr pBytes, Int32 dwCount)
+        private static bool SendBytesToPrinter(string szPrinterName, IntPtr pBytes, int dwCount)
         {
-            Int32 dwError = 0, dwWritten = 0;
-            IntPtr hPrinter = new IntPtr(0);
-            DOCINFOA di = new DOCINFOA();
-            bool bSuccess = false; // Assume failure unless you specifically succeed.
+            var di = new DOCINFOA();
+            var bSuccess = false; // Assume failure unless you specifically succeed.
 
             di.pDocName = "Labels";
             di.pDataType = "RAW";
 
-            if (OpenPrinter(szPrinterName.Normalize(), out hPrinter, IntPtr.Zero))
+            if (!OpenPrinter(szPrinterName.Normalize(), out var hPrinter, IntPtr.Zero)) return false;
+            if (StartDocPrinter(hPrinter, 1, di))
             {
-                if (StartDocPrinter(hPrinter, 1, di))
+                if (StartPagePrinter(hPrinter))
                 {
-                    if (StartPagePrinter(hPrinter))
-                    {
-                        bSuccess = WritePrinter(hPrinter, pBytes, dwCount, out dwWritten);
-                        EndPagePrinter(hPrinter);
-                    }
-                    EndDocPrinter(hPrinter);
+                    bSuccess = WritePrinter(hPrinter, pBytes, dwCount, out _);
+                    EndPagePrinter(hPrinter);
                 }
-                ClosePrinter(hPrinter);
+                EndDocPrinter(hPrinter);
             }
+            ClosePrinter(hPrinter);
             // If you did not succeed, GetLastError may give more information
-            // about why not.
-            if (bSuccess == false)
-            {
-                dwError = Marshal.GetLastWin32Error();
-            }
+            // about why not.            
+            // var dwError = Marshal.GetLastWin32Error();
+            // throw new ApplicationException($"Print failure. Error code {dwError}");
             return bSuccess;
-        }                
-    }    
+
+        }
+    }
 }

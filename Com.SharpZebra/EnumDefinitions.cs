@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Com.SharpZebra
+namespace SharpZebra
 {
 
     public enum Alignment
@@ -71,6 +71,64 @@ namespace Com.SharpZebra
         CUSTOM_Y,
         CUSTOM_Z,
         CUSTOM_ALL = 42
+    }
+
+    public enum EPLFont
+    {
+        STANDARD_SMALLEST = 49,
+        STANDARD_SMALL,
+        STANDARD_NORMAL,
+        STANDARD_LARGE,
+        STANDARD_LARGEST,
+        STANDARD_NUMBERS1,
+        STANDARD_NUMBERS2,
+        STANDARD_SIMPLIFIED,
+        STANDARD_TRADITIONAL,
+        CUSTOM_A = 97,
+        CUSTOM_B,
+        CUSTOM_C,
+        CUSTOM_D,
+        CUSTOM_E,
+        CUSTOM_F,
+        CUSTOM_G,
+        CUSTOM_H,
+        CUSTOM_I,
+        CUSTOM_J,
+        CUSTOM_K,
+        CUSTOM_L,
+        CUSTOM_M,
+        CUSTOM_N,
+        CUSTOM_O,
+        CUSTOM_P,
+        CUSTOM_Q,
+        CUSTOM_R,
+        CUSTOM_S,
+        CUSTOM_T,
+        CUSTOM_U,
+        CUSTOM_V,
+        CUSTOM_W,
+        CUSTOM_X,
+        CUSTOM_Y,
+        CUSTOM_Z,
+    }
+
+    public enum ZPLFont
+    {
+        STANDARD_SCALABLE = 48, //0
+        STANDARD_SMALLEST = 65, //A
+        STANDARD_UPPER_ONLY,   //B
+        STANDARD_NARROW0 = 68, //D
+        STANDARD_OCR_B,        //E
+        STANDARD_NARROW1,      //F
+        STANDARD_NARROW2,      //G
+        STANDARD_OCR_A_UPPER,  //H
+        STANDARD_BOLD0 = 80,   //P
+        STANDARD_BOLD1,        //Q
+        STANDARD_BOLD2,        //R
+        STANDARD_BOLD3,        //S
+        STANDARD_BOLD4,        //T
+        STANDARD_BOLD5,        //U
+        STANDARD_BOLD6         //V
     }
 
     public enum BarcodeType

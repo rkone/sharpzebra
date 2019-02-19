@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace Com.SharpZebra.Commands
+namespace SharpZebra.Commands
 {
     public partial class ZPLCommands
     {

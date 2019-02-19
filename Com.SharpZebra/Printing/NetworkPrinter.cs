@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 
-namespace Com.SharpZebra.Printing
+namespace SharpZebra.Printing
 {
 
     public class NetworkPrinter: IZebraPrinter
@@ -17,12 +14,12 @@ namespace Com.SharpZebra.Printing
 
         public bool? Print(byte[] data)
         {
-            using (TcpClient printer = new TcpClient(Settings.PrinterName, Settings.PrinterPort))
+            using (var printer = new TcpClient(Settings.PrinterName, Settings.PrinterPort))
             {
-                using (NetworkStream strm = printer.GetStream())
+                using (var stream = printer.GetStream())
                 {
-                    strm.Write(data, 0, data.Length);
-                    strm.Close();
+                    stream.Write(data, 0, data.Length);
+                    stream.Close();
                 }
                 printer.Close();
             }

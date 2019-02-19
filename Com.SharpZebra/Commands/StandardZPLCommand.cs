@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 
-namespace Com.SharpZebra.Commands
+namespace SharpZebra.Commands
 {
     public partial class ZPLCommands
     {
@@ -18,7 +17,7 @@ namespace Com.SharpZebra.Commands
                 settings.AlignTearOff, settings.AlignLeft, settings.AlignTop, settings.Darkness, settings.Width + settings.AlignLeft));
         }
 
-        public static byte[] PrintBuffer(int copies)
+        public static byte[] PrintBuffer(int copies  = 1)
         {
             return Encoding.GetEncoding(850).GetBytes(copies > 1 ? $"^PQ{copies}^XZ" : "^XZ");
         }
@@ -67,20 +66,83 @@ namespace Com.SharpZebra.Commands
             return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BX{rotationValue}, {height},{qualityLevelValue},,,,,{aspectRatioValue},^FD{text}^FS");
         }
 
-        public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font, int height, int width, string text, int codepage = 850)
+        /// <summary>
+        /// Writes text using the printer's (hopefully) built-in font.
+        /// <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=1336"/>
+        /// ZPL Command: ^A.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=42"/>     
+        /// </summary>
+        /// <param name="left">Horizontal axis.</param>
+        /// <param name="top">Vertical axis.</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="font">ZebraFont to print with. Note: these enum names do not match printer output</param>
+        /// <param name="height">Height of text in dots. 10-32000, or 0 to scale based on width</param>
+        /// <param name="width">Width of text in dots. 10-32000, default or 0 to scale based on height</param>
+        /// <param name="text">Text to be written</param>                            
+        /// <param name="codepage">The text encoding page the printer is set to use</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        [Obsolete("Use ZPLFont instead of ZebraFont.")]
+        public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font, int height, int width = 0, string text = "", int codepage = 850)
         {
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("^FO{0},{1}^A{2}{3},{4},{5}^FD{6}^FS", left, top, (char)font, (char)rotation, height, width, text));
+            return Encoding.GetEncoding(codepage).GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}^FD{text}^FS");
         }
 
+        /// <summary>
+        /// Writes text using the printer's (hopefully) built-in font.
+        /// <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=1336"/>
+        /// ZPL Command: ^A.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=42"/>     
+        /// </summary>
+        /// <param name="left">Horizontal axis.</param>
+        /// <param name="top">Vertical axis.</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="font">ZPLFont to print with.</param>
+        /// <param name="height">Height of text in dots. 10-32000, or 0 to scale based on width</param>
+        /// <param name="width">Width of text in dots. 10-32000, default or 0 to scale based on height</param>
+        /// <param name="text">Text to be written</param>                            
+        /// <param name="codepage">The text encoding page the printer is set to use</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZPLFont font, int height, int width = 0, string text = "", int codepage = 850)
+        {
+            return Encoding.GetEncoding(codepage).GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}^FD{text}^FS");
+        }
+
+        /// <summary>
+        /// Writes text using a font previously uploaded to the printer.
+        /// ZPL Command: ^A@.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=44"/>     
+        /// </summary>
+        /// <param name="left">Horizontal axis.</param>
+        /// <param name="top">Vertical axis.</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="fontName">The name of the font from the printer's directory listing (ends in .FNT)</param>
+        /// <param name="storageArea">The drive the font is stored on. From your printer's directory listing.</param>
+        /// <param name="height">Height of text in dots for scalable fonts, nearest magnification found for bitmapped fonts (R, E, B or A)</param>
+        /// <param name="text">Text to be written</param>                            
+        /// <param name="codepage">The text encoding page the printer is set to use</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, string fontName, char storageArea, int height, string text, int codepage = 850)
         {
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}^FD{6}^FS", (char)rotation, height, storageArea, fontName, left, top, text));
+            var rotationValue = (char) rotation;
+            return Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}^FD{6}^FS", rotationValue, height, storageArea, fontName, left, top, text));
         }
 
+        /// <summary>
+        /// Writes text using a font previously uploaded to the printer. Prints with the last used font.
+        /// ZPL Command: ^A@.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=44"/>     
+        /// </summary>
+        /// <param name="left">Horizontal axis.</param>
+        /// <param name="top">Vertical axis.</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="height">Height of text in dots for scalable fonts, nearest magnification found for bitmapped fonts (R, E, B or A)</param>
+        /// <param name="text">Text to be written</param>                            
+        /// <param name="codepage">The text encoding page the printer is set to use</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, int height, string text, int codepage = 850)
         {
             //uses last specified font
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1}^FO{2},{3}^FD{4}^FS", (char)rotation, height, left, top, text));
+            return Encoding.GetEncoding(codepage).GetBytes($"^A@{(char) rotation},{height}^FO{left},{top}^FD{text}^FS");
         }
 
         public static byte[] TextAlign(int width, Alignment alignment, byte[] textCommand)
@@ -95,11 +157,11 @@ namespace Com.SharpZebra.Commands
             //maxLines [1,9999]
             //lineSpacing [-9999,9999]
             //indentSize [0,9999]
-
+            var alignmentValue = (char) alignment;
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
-            writer.Write(textCommand.Take(textCommand.Length - 3).ToArray()); //strip ^FS from given command
-            var s = string.Format("^FB{0},{1},{2},{3},{4}^FS", width, maxLines, lineSpacing, (char)alignment, indentSize);
+            writer.Write(textCommand, 0, textCommand.Length - 3); //strip ^FS from given command
+            var s = $"^FB{width},{maxLines},{lineSpacing},{alignmentValue},{indentSize}^FS";
             writer.Write(Encoding.GetEncoding(codepage).GetBytes(s));
             return stream.ToArray();
         }
@@ -116,12 +178,11 @@ namespace Com.SharpZebra.Commands
 
             //zpl requires that straight lines are drawn with GB (Graphic-Box)
             if (width < lineThickness)
-                return BoxWrite(left - ((int)(lineThickness / 2)), top, lineThickness, width, height, 0);
+                return BoxWrite(left - lineThickness / 2, top, lineThickness, width, height, 0);
             if (height < lineThickness)
-                return BoxWrite(left, top - ((int)(lineThickness / 2)), lineThickness, width, height, 0);
+                return BoxWrite(left, top - lineThickness / 2, lineThickness, width, height, 0);
 
-            return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^GD{2},{3},{4},{5},{6}^FS", l, t, width, height,
-                    lineThickness, "", diagonal));
+            return Encoding.GetEncoding(850).GetBytes($"^FO{l},{t}^GD{width},{height},{lineThickness},,{diagonal}^FS");
         }
 
         public static byte[] BoxWrite(int left, int top, int lineThickness, int width, int height, int rounding)
