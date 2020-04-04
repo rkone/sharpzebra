@@ -80,8 +80,8 @@ namespace SharpZebra.Printing
             {
                 subKey = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Print\\Printers\\" + printer);
                 if (subKey == null) continue;
-                var portValue = subKey.GetValue("Port").ToString();
-                if (portValue.Substring(0, 3) == "USB")
+                var portValue = subKey.GetValue("Port", string.Empty).ToString();
+                if (portValue.Length >= 3 && portValue.Substring(0, 3) == "USB")
                 {
                     if (int.TryParse(portValue.Substring(3, portValue.Length - 3), out portNumber))
                     {
@@ -139,7 +139,7 @@ namespace SharpZebra.Printing
             if (plist.ContainsKey(printerName))
                 _interfaceName = plist[printerName];
             else
-                throw new Exception("Cannot locate USB device");
+                throw new Exception($"No printer named {printerName} was found connected via USB.");
         }
 
         /// <summary>
