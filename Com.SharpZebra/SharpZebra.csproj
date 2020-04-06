@@ -3,9 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net20</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>v1.0.1: Reverted back to .Net 2.0 from 4.5.2.  Separated ZebraFont to EPLFont and ZPLFont. BREAKING: Cleaned namespace to simply be SharpZebra. 
-</PackageReleaseNotes>
+    <Version>1.0.3</Version>
+    <PackageReleaseNotes>v1.0.3: Signed Assembly</PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
     <Authors>rkone</Authors>
     <Company>rkone</Company>
@@ -13,8 +12,11 @@
     <Description>A .net library that simplifies printing to Zebra printers in their native EPL2/ZPL languages without needing to know EPL2 or ZPL.  
 NEW: Check out SharpZebraStandard - a NetStandard2.0 version for those using only networked label printers.</Description>
     <PackageTags>Barcode Zebra Label Printer</PackageTags>
-    <Copyright>Copyright 2019</Copyright>
+    <Copyright></Copyright>
     <PackageVersion>1.0.0</PackageVersion>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>SharpZebraSigning.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />

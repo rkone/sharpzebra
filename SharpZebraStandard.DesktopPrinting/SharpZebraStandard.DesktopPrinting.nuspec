@@ -1,18 +1,19 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>SharpZebraStandard.DesktopPrinting</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>rkone</authors>
     <owners>$author$</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Adds printing to USB and Spool (shared network) Zebra label printers</description>
-    <releaseNotes>Moved to SharpZebra namespace.</releaseNotes>
-    <copyright>Copyright 2019</copyright>
+    <releaseNotes>Signed Assembly</releaseNotes>
+    <copyright></copyright>
     <tags>Zebra Printer Barcode Label</tags>
     <dependencies>
-      <dependency id="SharpZebraStandard" version="1.0.1" />
+      <group targetFramework=".NETFramework4.7.2" />
+      <dependency id="SharpZebraStandard" version="1.0.4" />
     </dependencies>
   </metadata>
 </package>

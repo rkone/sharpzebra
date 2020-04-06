@@ -5,9 +5,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>v1.0.1: Separated ZebraFont to EPLFont and ZPLFont. BREAKING: Changed namespace to be simply SharpZebra.</PackageReleaseNotes>
+    <Version>1.0.2</Version>
+    <PackageReleaseNotes>v1.0.2: Signed assembly</PackageReleaseNotes>
     <RootNamespace>SharpZebra</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>SharpZebraSigning.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
