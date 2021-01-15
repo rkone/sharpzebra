@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net20</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.3</Version>
-    <PackageReleaseNotes>v1.0.3: Signed Assembly</PackageReleaseNotes>
+    <Version>1.0.4</Version>
+    <PackageReleaseNotes>v1.0.4: Allowed ability to print tilde (~) characters. But not tilde and underscore in the same field.</PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
     <Authors>rkone</Authors>
     <Company>rkone</Company>
