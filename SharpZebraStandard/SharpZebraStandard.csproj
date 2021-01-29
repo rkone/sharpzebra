@@ -5,8 +5,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
-    <Version>1.0.3</Version>
-    <PackageReleaseNotes>v1.0.3: Allowed ability to print tilde (~) characters. But not tilde and underscore in the same field.</PackageReleaseNotes>
+    <Version>1.0.4</Version>
+    <PackageReleaseNotes>v1.0.4: Accept null text in ZPLCommands.TextWrite</PackageReleaseNotes>
     <RootNamespace>SharpZebra</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>SharpZebraSigning.snk</AssemblyOriginatorKeyFile>

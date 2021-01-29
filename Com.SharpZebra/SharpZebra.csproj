@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net20</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.4</Version>
-    <PackageReleaseNotes>v1.0.4: Allowed ability to print tilde (~) characters. But not tilde and underscore in the same field.</PackageReleaseNotes>
+    <Version>1.0.5</Version>
+    <PackageReleaseNotes>v1.0.5: Accept null text in ZPLCommands.TextWrite</PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
     <Authors>rkone</Authors>
     <Company>rkone</Company>
@@ -13,7 +13,6 @@
 NEW: Check out SharpZebraStandard - a NetStandard2.0 version for those using only networked label printers.</Description>
     <PackageTags>Barcode Zebra Label Printer</PackageTags>
     <Copyright></Copyright>
-    <PackageVersion>1.0.0</PackageVersion>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>SharpZebraSigning.snk</AssemblyOriginatorKeyFile>

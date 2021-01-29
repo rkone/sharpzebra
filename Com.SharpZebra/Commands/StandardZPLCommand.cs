@@ -105,7 +105,10 @@ namespace SharpZebra.Commands
         [Obsolete("Use ZPLFont instead of ZebraFont.")]
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font, int height, int width = 0, string text = "", int codepage = 850)
         {
-            return Encoding.GetEncoding(codepage).GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}{FixTilde(text)}FH");
+            return string.IsNullOrEmpty(text)
+                ? new byte[0]
+                : Encoding.GetEncoding(codepage)
+                    .GetBytes($"^FO{left},{top}^A{(char) font}{(char) rotation},{height},{width}{FixTilde(text)}FH");
         }
 
         /// <summary>
@@ -125,7 +128,10 @@ namespace SharpZebra.Commands
         /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZPLFont font, int height, int width = 0, string text = "", int codepage = 850)
         {
-            return Encoding.GetEncoding(codepage).GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}{FixTilde(text)}");
+            return string.IsNullOrEmpty(text)
+                ? new byte[0]
+                : Encoding.GetEncoding(codepage)
+                    .GetBytes($"^FO{left},{top}^A{(char) font}{(char) rotation},{height},{width}{FixTilde(text)}");
         }
 
         /// <summary>
@@ -145,7 +151,10 @@ namespace SharpZebra.Commands
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, string fontName, char storageArea, int height, string text, int codepage = 850)
         {
             var rotationValue = (char) rotation;
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}{6}", rotationValue, height, storageArea, fontName, left, top, FixTilde(text)));
+            return string.IsNullOrEmpty(text)
+                ? new byte[0]
+                : Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}{6}",
+                    rotationValue, height, storageArea, fontName, left, top, FixTilde(text)));
         }
 
         /// <summary>
@@ -163,7 +172,10 @@ namespace SharpZebra.Commands
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, int height, string text, int codepage = 850)
         {
             //uses last specified font
-            return Encoding.GetEncoding(codepage).GetBytes($"^A@{(char) rotation},{height}^FO{left},{top}{FixTilde(text)}");
+            return string.IsNullOrEmpty(text)
+                ? new byte[0]
+                : Encoding.GetEncoding(codepage)
+                    .GetBytes($"^A@{(char) rotation},{height}^FO{left},{top}{FixTilde(text)}");
         }
 
         /// <summary>
@@ -232,6 +244,7 @@ namespace SharpZebra.Commands
 
         private static string FixTilde(string text)
         {
+            if (string.IsNullOrEmpty(text)) return text;
             if (!text.Contains("~"))
                 return $"^FD{text}^FS";
             if (text.Contains("_"))
