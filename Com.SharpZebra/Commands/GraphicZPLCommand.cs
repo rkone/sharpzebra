@@ -15,6 +15,7 @@ namespace SharpZebra.Commands
             private Font _font;
             private ElementDrawRotation _rotation;
             private string _text;
+            private bool _inverse;
             private Bitmap _customImage;
 
             public string Text
@@ -35,6 +36,17 @@ namespace SharpZebra.Commands
                 {
                     if (Equals(value, _font)) return;
                     _font = value;
+                    InitGraphic();
+                }
+            }
+
+            public bool Inverse
+            {
+                get => _inverse;
+                set
+                {
+                    if (value == _inverse) return;
+                    _inverse = value;
                     InitGraphic();
                 }
             }
@@ -81,9 +93,18 @@ namespace SharpZebra.Commands
                         Trimming = StringTrimming.None
                     };
                     
-                    g.Clear(Color.White);
-                    g.DrawString(_text, _font, new SolidBrush(Color.Black), 0, 0, stringFormat);
-                    g.Flush();
+                    if (!_inverse)
+                    {
+                        g.Clear(Color.White);
+                        g.DrawString(_text, _font, new SolidBrush(Color.Black), 0, 0, stringFormat);
+                        g.Flush();
+                    }
+                    else
+                    {
+                        g.Clear(Color.Black);
+                        g.DrawString(_text, _font, new SolidBrush(Color.White), 0, 0, stringFormat);
+                        g.Flush();
+                    }
                 }                 
                 switch (_rotation)
                 {
@@ -113,7 +134,13 @@ namespace SharpZebra.Commands
         /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer</returns>
         public static byte[] CustomStringWrite(int left, int top, ElementDrawRotation rotation, Font font, string text, char? ramDrive = null)
         {
-            var s = new CustomString {Font = font, Rotation = rotation, Text = text};
+            var s = new CustomString {Font = font, Rotation = rotation, Text = text, Inverse = false};
+            return CustomStringWrite(left, top, s, ramDrive);
+        }
+
+        public static byte[] CustomInverseStringWrite(int left, int top, ElementDrawRotation rotation, Font font, string text, char? ramDrive = null)
+        {
+            var s = new CustomString { Font = font, Rotation = rotation, Text = text, Inverse = true };
             return CustomStringWrite(left, top, s, ramDrive);
         }
 
