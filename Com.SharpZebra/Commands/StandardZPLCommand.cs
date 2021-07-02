@@ -208,6 +208,7 @@ namespace SharpZebra.Commands
             //maxLines [1,9999]
             //lineSpacing [-9999,9999]
             //indentSize [0,9999]
+            if (textCommand.Length < 3) return new byte[0];
             var alignmentValue = (char) alignment;
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
