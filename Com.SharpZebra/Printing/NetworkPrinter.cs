@@ -3,7 +3,7 @@
 namespace SharpZebra.Printing
 {
 
-    public class NetworkPrinter: IZebraPrinter
+    public class NetworkPrinter : IZebraPrinter
     {
         public PrinterSettings Settings { get; set; }
 

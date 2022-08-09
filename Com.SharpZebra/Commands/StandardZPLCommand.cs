@@ -27,7 +27,7 @@ namespace SharpZebra.Commands
         /// </summary>
         /// <param name="copies">The number of identical copies of the label to print</param>
         /// <returns>>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
-        public static byte[] PrintBuffer(int copies  = 1)
+        public static byte[] PrintBuffer(int copies = 1)
         {
             return Encoding.GetEncoding(850).GetBytes(copies > 1 ? $"^PQ{copies}^XZ" : "^XZ");
         }
@@ -50,13 +50,13 @@ namespace SharpZebra.Commands
             {
                 case BarcodeType.CODE39_STD_EXT:
                     return Encoding.GetEncoding(850).GetBytes(
-                        $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^B3{(char) rotation},,{height},{encodedReadable}^FD{barcodeData}^FS");
+                        $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^B3{(char)rotation},,{height},{encodedReadable}^FD{barcodeData}^FS");
                 case BarcodeType.CODE128_AUTO:
                     return Encoding.GetEncoding(850).GetBytes(
-                        $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BC{(char) rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
+                        $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BC{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
                 case BarcodeType.UPC_A:
                     return Encoding.GetEncoding(850).GetBytes(
-                        $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BU{(char) rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
+                        $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BU{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
                 case BarcodeType.EAN13:
                     return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^BY{2}^BE{3},{4},{5}^FD{6}^FS", left, top,
                         barcode.BarWidthNarrow, (char)rotation, height, encodedReadable, barcodeData));
@@ -125,7 +125,7 @@ namespace SharpZebra.Commands
             return string.IsNullOrEmpty(text)
                 ? new byte[0]
                 : Encoding.GetEncoding(codepage)
-                    .GetBytes($"^FO{left},{top}^A{(char) font}{(char) rotation},{height},{width}{FixTilde(text)}FH");
+                    .GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}{FixTilde(text)}FH");
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace SharpZebra.Commands
             return string.IsNullOrEmpty(text)
                 ? new byte[0]
                 : Encoding.GetEncoding(codepage)
-                    .GetBytes($"^FO{left},{top}^A{(char) font}{(char) rotation},{height},{width}{FixTilde(text)}");
+                    .GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}{FixTilde(text)}");
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace SharpZebra.Commands
         /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, string fontName, char storageArea, int height, string text, int codepage = 850)
         {
-            var rotationValue = (char) rotation;
+            var rotationValue = (char)rotation;
             return string.IsNullOrEmpty(text)
                 ? new byte[0]
                 : Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}{6}",
@@ -192,7 +192,7 @@ namespace SharpZebra.Commands
             return string.IsNullOrEmpty(text)
                 ? new byte[0]
                 : Encoding.GetEncoding(codepage)
-                    .GetBytes($"^A@{(char) rotation},{height}^FO{left},{top}{FixTilde(text)}");
+                    .GetBytes($"^A@{(char)rotation},{height}^FO{left},{top}{FixTilde(text)}");
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace SharpZebra.Commands
             //lineSpacing [-9999,9999]
             //indentSize [0,9999]
             if (textCommand.Length < 3) return new byte[0];
-            var alignmentValue = (char) alignment;
+            var alignmentValue = (char)alignment;
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
             writer.Write(textCommand, 0, textCommand.Length - 3); //strip ^FS from given command
@@ -269,7 +269,7 @@ namespace SharpZebra.Commands
                 throw new ApplicationException("Tilde character is not supported with underscore in same command");
             return $"^FH^FD{text.Replace("~", "_7e")}^FS";
         }
-        
+
         /*
         public static string FormDelete(string formName)
         {

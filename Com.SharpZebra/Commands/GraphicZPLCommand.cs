@@ -58,7 +58,7 @@ namespace SharpZebra.Commands
                 {
                     if (value == _rotation) return;
                     _rotation = value;
-                    InitGraphic();                    
+                    InitGraphic();
                 }
             }
 
@@ -75,8 +75,8 @@ namespace SharpZebra.Commands
                     _customImage = null;
                     return;
                 }
-                
-                _customImage = new Bitmap(1,1);
+
+                _customImage = new Bitmap(1, 1);
                 var graphics = Graphics.FromImage(_customImage);
                 graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
                 var sWidth = (int)graphics.MeasureString(_text, _font).Width;
@@ -84,7 +84,7 @@ namespace SharpZebra.Commands
                 _customImage = new Bitmap(_customImage, sWidth, sHeight);
 
                 using (var g = Graphics.FromImage(_customImage))
-                {                    
+                {
                     g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
                     var stringFormat = new StringFormat()
                     {
@@ -92,7 +92,7 @@ namespace SharpZebra.Commands
                         LineAlignment = StringAlignment.Near,
                         Trimming = StringTrimming.None
                     };
-                    
+
                     if (!_inverse)
                     {
                         g.Clear(Color.White);
@@ -105,7 +105,7 @@ namespace SharpZebra.Commands
                         g.DrawString(_text, _font, new SolidBrush(Color.White), 0, 0, stringFormat);
                         g.Flush();
                     }
-                }                 
+                }
                 switch (_rotation)
                 {
                     case ElementDrawRotation.ROTATE_90_DEGREES:
@@ -117,7 +117,7 @@ namespace SharpZebra.Commands
                     case ElementDrawRotation.ROTATE_270_DEGREES:
                         _customImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
                         break;
-                }                
+                }
             }
         }
 
@@ -134,7 +134,7 @@ namespace SharpZebra.Commands
         /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer</returns>
         public static byte[] CustomStringWrite(int left, int top, ElementDrawRotation rotation, Font font, string text, char? ramDrive = null)
         {
-            var s = new CustomString {Font = font, Rotation = rotation, Text = text, Inverse = false};
+            var s = new CustomString { Font = font, Rotation = rotation, Text = text, Inverse = false };
             return CustomStringWrite(left, top, s, ramDrive);
         }
 
@@ -161,7 +161,7 @@ namespace SharpZebra.Commands
         }
 
         public static byte[] GraphicStore(Bitmap image, char storageArea, string imageName)
-        {    
+        {
             //Note that we're using the RED channel to determine if each pixel of an image is enabled.  
             //No dithering is done: values of red higher than 128 are on.
             var res = new List<byte>();
@@ -182,18 +182,18 @@ namespace SharpZebra.Commands
                             ba[k] = image.GetPixel(scanx, y).R < 128;
                         scanx++;
                     }
-                    res.AddRange(Encoding.GetEncoding(850).GetBytes($"{ConvertToByte(ba):X2}"));                    
+                    res.AddRange(Encoding.GetEncoding(850).GetBytes($"{ConvertToByte(ba):X2}"));
                 }
                 res.AddRange(Encoding.GetEncoding(850).GetBytes("\n"));
             }
-            return res.ToArray(); 
+            return res.ToArray();
         }
 
         public static byte[] GraphicDelete(char storageArea, string imageName)
         {
             return Encoding.GetEncoding(850).GetBytes($"^ID{storageArea}:{imageName}.GRF^FS");
         }
-        
+
         private static byte ConvertToByte(BitArray bits)
         {
             byte value = 0x00;
@@ -203,6 +203,6 @@ namespace SharpZebra.Commands
                 value |= (byte)(bits[x] ? 0x01 << x : 0x00);
             }
             return value;
-        }       		 	
+        }
     }
 }

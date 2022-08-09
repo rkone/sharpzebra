@@ -21,7 +21,7 @@ namespace SharpZebra.Commands
             byte[] fileContents = binaryReader.ReadBytes((int)fileStream.Length);
             binaryReader.Close();
             List<byte> res = new List<byte>();
-            res.AddRange(Encoding.GetEncoding(437).GetBytes(string.Format("GK\"{0}\"\nGM\"{0}\"{1}\n", imageName,fileContents.Length)));
+            res.AddRange(Encoding.GetEncoding(437).GetBytes(string.Format("GK\"{0}\"\nGM\"{0}\"{1}\n", imageName, fileContents.Length)));
             res.AddRange(fileContents);
             return res.ToArray();
         }
@@ -42,7 +42,7 @@ namespace SharpZebra.Commands
         public static byte[] GraphicDirectWrite(int left, int top, string bitmapName, PrinterSettings settings)
         {
             Bitmap bmp = new Bitmap(bitmapName);
-            List<byte> res = new List<byte>();            
+            List<byte> res = new List<byte>();
             int byteWidth = bmp.Width % 8 == 0 ? bmp.Width / 8 : bmp.Width / 8 + 1;
             res.AddRange(Encoding.GetEncoding(437).GetBytes(string.Format("GW{0},{1},{2},{3},", left + settings.AlignLeft, top + settings.AlignTop, byteWidth, bmp.Height)));
             for (int y = 0; y < bmp.Height; y++)
@@ -63,7 +63,7 @@ namespace SharpZebra.Commands
                 }
             }
             return res.ToArray();
-        }        
+        }
 
     }
 }

@@ -8,9 +8,9 @@ namespace SharpZebra.Commands
     public partial class EPLCommands
     {
         public static byte[] ClearPrinter(PrinterSettings settings, int codepage = 437)
-        {       
+        {
             return Encoding.GetEncoding(codepage).GetBytes(string.Format("\nN\nO\nQ{0},{1}\nq{2}\nS{3}\nD{4}\nZB\nJF\nI8,{5:x},{6:000}\n", settings.Length + 10, 25,
-                settings.Width + settings.AlignLeft, settings.PrintSpeed, settings.Darkness, (int)Codepage8.DOS_437, (int)Codepage8KDU.USA));  
+                settings.Width + settings.AlignLeft, settings.PrintSpeed, settings.Darkness, (int)Codepage8.DOS_437, (int)Codepage8KDU.USA));
         }
 
         public static byte[] PrintBuffer(int copies, int codepage = 437)
@@ -18,11 +18,11 @@ namespace SharpZebra.Commands
             return Encoding.GetEncoding(codepage).GetBytes($"P{copies}\n");
         }
 
-        public static byte[] BarCodeWrite(int left, int top, int height, ElementDrawRotation rotation, Barcode barcode, bool readable, 
+        public static byte[] BarCodeWrite(int left, int top, int height, ElementDrawRotation rotation, Barcode barcode, bool readable,
             string barcodeData, PrinterSettings settings, int codepage = 437)
         {
             string encodedReadable = readable ? "B" : "N";
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("B{0},{1},{2},{3},{4},{5},{6},{7},\"{8}\"\n", left + settings.AlignLeft, 
+            return Encoding.GetEncoding(codepage).GetBytes(string.Format("B{0},{1},{2},{3},{4},{5},{6},{7},\"{8}\"\n", left + settings.AlignLeft,
                 top + settings.AlignTop, EPLConvert.Rotation(rotation), barcode.P4Value, barcode.BarWidthNarrow, barcode.BarWidthWide, height, encodedReadable,
                 barcodeData));
         }
@@ -33,7 +33,7 @@ namespace SharpZebra.Commands
         {
             return Encoding.GetEncoding(codepage).GetBytes(string.Format("A{0},{1},{2},{3},{4},{5},{6},\"{7}\"\n",
                 left + settings.AlignLeft,
-                top + settings.AlignTop, EPLConvert.Rotation(rotation), (char) font, horizontalMult, verticalMult,
+                top + settings.AlignTop, EPLConvert.Rotation(rotation), (char)font, horizontalMult, verticalMult,
                 isReverse ? "R" : "N", text.Replace(@"\", @"\\").Replace("\"", "\\\"")));
         }
 
@@ -48,7 +48,7 @@ namespace SharpZebra.Commands
 
         public static byte[] LineWriteBlack(int left, int top, int width, int height, PrinterSettings settings, int codepage = 437)
         {
-            return LineDraw("LO", left, top, width,height, settings, codepage);
+            return LineDraw("LO", left, top, width, height, settings, codepage);
         }
 
         public static byte[] LineWriteWhite(int left, int top, int width, int height, PrinterSettings settings, int codepage = 437)
@@ -63,19 +63,19 @@ namespace SharpZebra.Commands
 
         public static byte[] DiagonalLineWrite(int left, int top, int lineThickness, int right, int bottom, PrinterSettings settings, int codepage = 437)
         {
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("LS{0},{1},{2},{3},{4}\n", left + settings.AlignLeft, top + settings.AlignTop, 
+            return Encoding.GetEncoding(codepage).GetBytes(string.Format("LS{0},{1},{2},{3},{4}\n", left + settings.AlignLeft, top + settings.AlignTop,
                 lineThickness, right + settings.AlignLeft, bottom + settings.AlignTop));
         }
 
         public static byte[] BoxWrite(int left, int top, int lineThickness, int right, int bottom, PrinterSettings settings, int codepage = 437)
         {
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("X{0},{1},{2},{3},{4}\n", left + settings.AlignLeft, top + settings.AlignTop, 
+            return Encoding.GetEncoding(codepage).GetBytes(string.Format("X{0},{1},{2},{3},{4}\n", left + settings.AlignLeft, top + settings.AlignTop,
                 lineThickness, right + settings.AlignLeft, bottom + settings.AlignTop));
         }
 
         private static byte[] LineDraw(string lineDrawCode, int left, int top, int width, int height, PrinterSettings settings, int codepage = 437)
         {
-            return Encoding.GetEncoding(codepage).GetBytes(string.Format("{0}{1},{2},{3},{4}\n", lineDrawCode, left + settings.AlignLeft, 
+            return Encoding.GetEncoding(codepage).GetBytes(string.Format("{0}{1},{2},{3},{4}\n", lineDrawCode, left + settings.AlignLeft,
                 top + settings.AlignTop, width, height));
         }
 
@@ -97,11 +97,11 @@ namespace SharpZebra.Commands
 
         public static byte[] CodePageSet(Codepage7 c, int codepage = 437)
         {
-            return Encoding.GetEncoding(codepage).GetBytes($"I7,{(int) c}\n");
+            return Encoding.GetEncoding(codepage).GetBytes($"I7,{(int)c}\n");
         }
         public static byte[] CodePageSet(Codepage8 codePage, Codepage8KDU country, int codepage = 437)
         {
-            return Encoding.GetEncoding(codepage).GetBytes($"I8,{(int) codePage:x},{country:000}\n");
+            return Encoding.GetEncoding(codepage).GetBytes($"I8,{(int)codePage:x},{country:000}\n");
         }
 
         public static byte[] EPL_Align(PrinterSettings p, int codepage = 437)
