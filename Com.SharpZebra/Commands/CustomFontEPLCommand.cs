@@ -7,11 +7,6 @@ namespace SharpZebra.Commands
 {
     public partial class EPLCommands
     {
-        public static float CustomFontEmSize(Font font)
-        {
-            return 0;
-        }
-
         public static byte[] CustomFontDelete(ZebraFont name)
         {
             if (name != ZebraFont.CUSTOM_ALL && name < ZebraFont.CUSTOM_A)

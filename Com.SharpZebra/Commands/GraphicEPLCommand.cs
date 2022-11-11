@@ -9,12 +9,12 @@ namespace SharpZebra.Commands
 {
     public partial class EPLCommands
     {
-
+#pragma warning disable IDE0060
         public static byte[] GraphicWrite(int left, int top, string imageName, PrinterSettings settings)
         {
             return Encoding.GetEncoding(437).GetBytes(string.Format("GG{0},{1},\"{2}\"\n", left, top, imageName));
         }
-
+#pragma warning restore IDE0060
         public static byte[] GraphicStore(Stream fileStream, string imageName)
         {
             BinaryReader binaryReader = new BinaryReader(fileStream);
