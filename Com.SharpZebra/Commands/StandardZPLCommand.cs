@@ -123,7 +123,7 @@ namespace SharpZebra.Commands
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font, int height, int width = 0, string text = "", int codepage = 850)
         {
             return string.IsNullOrEmpty(text)
-                ? new byte[0]
+                ? Array.Empty<byte>()
                 : Encoding.GetEncoding(codepage)
                     .GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}{FixTilde(text)}FH");
         }
@@ -146,7 +146,7 @@ namespace SharpZebra.Commands
         public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZPLFont font, int height, int width = 0, string text = "", int codepage = 850)
         {
             return string.IsNullOrEmpty(text)
-                ? new byte[0]
+                ? Array.Empty<byte>()
                 : Encoding.GetEncoding(codepage)
                     .GetBytes($"^FO{left},{top}^A{(char)font}{(char)rotation},{height},{width}{FixTilde(text)}");
         }
@@ -169,7 +169,7 @@ namespace SharpZebra.Commands
         {
             var rotationValue = (char)rotation;
             return string.IsNullOrEmpty(text)
-                ? new byte[0]
+                ? Array.Empty<byte>()
                 : Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}{6}",
                     rotationValue, height, storageArea, fontName, left, top, FixTilde(text)));
         }
@@ -190,7 +190,7 @@ namespace SharpZebra.Commands
         {
             //uses last specified font
             return string.IsNullOrEmpty(text)
-                ? new byte[0]
+                ? Array.Empty<byte>()
                 : Encoding.GetEncoding(codepage)
                     .GetBytes($"^A@{(char)rotation},{height}^FO{left},{top}{FixTilde(text)}");
         }
@@ -225,7 +225,7 @@ namespace SharpZebra.Commands
             //maxLines [1,9999]
             //lineSpacing [-9999,9999]
             //indentSize [0,9999]
-            if (textCommand.Length < 3) return new byte[0];
+            if (textCommand.Length < 3) return Array.Empty<byte>();
             var alignmentValue = (char)alignment;
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
