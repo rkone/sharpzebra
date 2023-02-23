@@ -11,7 +11,7 @@ namespace SharpZebra.Commands
         {
             if (name != ZebraFont.CUSTOM_ALL && name < ZebraFont.CUSTOM_A)
             {
-                throw new ApplicationException("Unable to delete standard fonts");
+                throw new ArgumentException("Unable to delete standard fonts");
             }
             return System.Text.Encoding.GetEncoding(437).GetBytes("EK\"" + (char)name + "\"\n");
         }

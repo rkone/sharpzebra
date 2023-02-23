@@ -310,7 +310,7 @@ namespace SharpZebra
                 else
                 {
                     if (value < P5MinList[(int)type] || value > P5MaxList[(int)type])
-                        throw new ApplicationException("Invalid barcode narrow bar width setting");
+                        throw new ArgumentOutOfRangeException(nameof(BarWidthNarrow));
                     else
                         barWidthNarrow = value;
                 }
@@ -323,7 +323,7 @@ namespace SharpZebra
             set
             {
                 if (value < 2 || value > 30)
-                    throw new ApplicationException("Invalid barcode wide bar width setting");
+                    throw new ArgumentOutOfRangeException(nameof(BarWidthWide));
                 else
                     barWidthWide = value;
             }

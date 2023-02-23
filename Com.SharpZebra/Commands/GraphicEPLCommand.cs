@@ -12,7 +12,7 @@ namespace SharpZebra.Commands
 #pragma warning disable IDE0060
         public static byte[] GraphicWrite(int left, int top, string imageName, PrinterSettings settings)
         {
-            return Encoding.GetEncoding(437).GetBytes(string.Format("GG{0},{1},\"{2}\"\n", left, top, imageName));
+            return Encoding.GetEncoding(437).GetBytes($"GG{left},{top},\"{imageName}\"\n");
         }
 #pragma warning restore IDE0060
         public static byte[] GraphicStore(Stream fileStream, string imageName)
@@ -21,7 +21,7 @@ namespace SharpZebra.Commands
             byte[] fileContents = binaryReader.ReadBytes((int)fileStream.Length);
             binaryReader.Close();
             List<byte> res = new List<byte>();
-            res.AddRange(Encoding.GetEncoding(437).GetBytes(string.Format("GK\"{0}\"\nGM\"{0}\"{1}\n", imageName, fileContents.Length)));
+            res.AddRange(Encoding.GetEncoding(437).GetBytes($"GK\"{imageName}\"\nGM\"{imageName}\"{fileContents.Length}\n"));
             res.AddRange(fileContents);
             return res.ToArray();
         }
@@ -36,7 +36,7 @@ namespace SharpZebra.Commands
 
         public static byte[] GraphicDelete(string imageName)
         {
-            return Encoding.GetEncoding(437).GetBytes(string.Format("GK\"{0}\"\n", imageName));
+            return Encoding.GetEncoding(437).GetBytes($"GK\"{imageName}\"\n");
         }
 
         public static byte[] GraphicDirectWrite(int left, int top, string bitmapName, PrinterSettings settings)
@@ -44,7 +44,7 @@ namespace SharpZebra.Commands
             Bitmap bmp = new Bitmap(bitmapName);
             List<byte> res = new List<byte>();
             int byteWidth = bmp.Width % 8 == 0 ? bmp.Width / 8 : bmp.Width / 8 + 1;
-            res.AddRange(Encoding.GetEncoding(437).GetBytes(string.Format("GW{0},{1},{2},{3},", left + settings.AlignLeft, top + settings.AlignTop, byteWidth, bmp.Height)));
+            res.AddRange(Encoding.GetEncoding(437).GetBytes($"GW{left + settings.AlignLeft},{top + settings.AlignTop},{byteWidth},{bmp.Height},"));
             for (int y = 0; y < bmp.Height; y++)
             {
                 for (int x = 0; x < byteWidth; x++)

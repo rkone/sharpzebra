@@ -266,7 +266,7 @@ namespace SharpZebra.Commands
             if (!text.Contains("~"))
                 return $"^FD{text}^FS";
             if (text.Contains("_"))
-                throw new ApplicationException("Tilde character is not supported with underscore in same command");
+                throw new ArgumentException("Tilde character is not supported with underscore in same command");
             return $"^FH^FD{text.Replace("~", "_7e")}^FS";
         }
 
