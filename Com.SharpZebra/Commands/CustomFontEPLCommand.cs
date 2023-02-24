@@ -121,7 +121,7 @@ namespace SharpZebra.Commands
         {
             if (name < ZebraFont.CUSTOM_A)
             {
-                throw new ApplicationException("Invalid font name selected for storing");
+                throw new ArgumentOutOfRangeException(nameof(name));
             }
 
             var sendBytes = new List<byte>();

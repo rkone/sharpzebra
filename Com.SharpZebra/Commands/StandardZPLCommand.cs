@@ -18,8 +18,8 @@ namespace SharpZebra.Commands
             //^XA^MMT^PR4,12,12~TA000^LS-20^LH0,12~SD19^PW750
             _stringCounter = 0;
             _printerSettings = settings;
-            return Encoding.GetEncoding(850).GetBytes(string.Format("^XA^MMT^PR{0},12,12~TA{1:000}^LH{2},{3}~SD{4:00}^PW{5}", settings.PrintSpeed,
-                settings.AlignTearOff, settings.AlignLeft, settings.AlignTop, settings.Darkness, settings.Width + settings.AlignLeft));
+            return Encoding.GetEncoding(850).GetBytes(
+                $"^XA^MMT^PR{settings.PrintSpeed},12,12~TA{settings.AlignTearOff:000}^LH{settings.AlignLeft},{settings.AlignTop}~SD{settings.Darkness:00}^PW{settings.Width + settings.AlignLeft}");
         }
 
         /// <summary>
@@ -58,10 +58,10 @@ namespace SharpZebra.Commands
                     return Encoding.GetEncoding(850).GetBytes(
                         $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BU{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
                 case BarcodeType.EAN13:
-                    return Encoding.GetEncoding(850).GetBytes(string.Format("^FO{0},{1}^BY{2}^BE{3},{4},{5}^FD{6}^FS", left, top,
-                        barcode.BarWidthNarrow, (char)rotation, height, encodedReadable, barcodeData));
+                    return Encoding.GetEncoding(850).GetBytes(
+                        $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BE{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
                 default:
-                    throw new ApplicationException("Barcode not yet supported by SharpZebra library.");
+                    throw new ArgumentException("Barcode not yet supported by SharpZebra library.");
             }
         }
 
@@ -95,13 +95,13 @@ namespace SharpZebra.Commands
         /// <param name="left">Horizontal axis.</param>
         /// <param name="top">Vertical axis.</param>
         /// <param name="height">Height is determined by dimension and data that is encoded.</param>
-        /// <param name="magnif_factor">Scale the QR Code, from 1 to 10  (1 = small, 10 = really big).</param>
+        /// <param name="magnificationfactor">Scale the QR Code, from 1 to 10  (1 = small, 10 = really big).</param>
         /// <param name="text">Text to be encoded</param>
         /// <param name="qualityLevel">Error correction (L, M, Q or H).</param>
         /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
-        public static byte[] QRCodeWrite(int left, int top, int magnif_factor, string text, string qualityLevel = "M")
+        public static byte[] QRCodeWrite(int left, int top, int magnificationFactor, string text, string qualityLevel = "M")
         {
-            return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BQN,2,{magnif_factor},{qualityLevel},^FD{qualityLevel}A,{text}^FS");
+            return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BQN,2,{magnificationFactor},{qualityLevel},^FD{qualityLevel}A,{text}^FS");
         }
 
         /// <summary>
@@ -170,8 +170,7 @@ namespace SharpZebra.Commands
             var rotationValue = (char)rotation;
             return string.IsNullOrEmpty(text)
                 ? Array.Empty<byte>()
-                : Encoding.GetEncoding(codepage).GetBytes(string.Format("^A@{0},{1},{1},{2}:{3}^FO{4},{5}{6}",
-                    rotationValue, height, storageArea, fontName, left, top, FixTilde(text)));
+                : Encoding.GetEncoding(codepage).GetBytes($"^A@{rotationValue},{height},{height},{storageArea}:{fontName}^FO{left},{top}{FixTilde(text)}");
         }
 
         /// <summary>

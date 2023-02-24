@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 namespace SharpZebra.Commands
 {
@@ -10,7 +11,7 @@ namespace SharpZebra.Commands
         private static int _stringCounter;
         private static Printing.PrinterSettings _printerSettings;
 
-        public class CustomString
+        public class CustomString : IDisposable
         {
             private Font _font;
             private ElementDrawRotation _rotation;
@@ -117,6 +118,24 @@ namespace SharpZebra.Commands
                     case ElementDrawRotation.ROTATE_270_DEGREES:
                         _customImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
                         break;
+                }
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this); 
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    if (_customImage != null)
+                    {
+                        _customImage.Dispose();
+                        _customImage = null;
+                    }
                 }
             }
         }

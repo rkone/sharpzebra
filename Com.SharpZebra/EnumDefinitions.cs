@@ -1,6 +1,7 @@
 ﻿using System;
 namespace SharpZebra
 {
+#pragma warning disable CA1707 // Identifiers should not contain underscores. Left in for compatibility
 
     public enum Alignment
     {
@@ -232,6 +233,7 @@ namespace SharpZebra
         ECC_140 = 140,
         ECC_200 = 200,
     }
+#pragma warning restore CA1707 // Identifiers should not contain underscores
 
     public enum AspectRatio
     {
