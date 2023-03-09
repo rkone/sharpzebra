@@ -43,8 +43,9 @@ public partial class ZPLCommands
     /// <param name="readable">Enable text to be printed at the bottom of the barcode.</param>
     /// <param name="barcodeData">Text to encode in the barcode</param>
     /// <returns>>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
-    public static byte[] BarCodeWrite(int left, int top, int height, ElementDrawRotation rotation, Barcode barcode, bool readable, string barcodeData)
+    public static byte[] BarCodeWrite(int left, int top, int height, ElementDrawRotation rotation, Barcode barcode, bool readable, string? barcodeData)
     {
+        if (barcodeData is null) return Array.Empty<byte>();
         var encodedReadable = readable ? "Y" : "N";
         return barcode.Type switch
         {
@@ -73,8 +74,9 @@ public partial class ZPLCommands
     /// <param name="qualityLevel">Version of Data Matrix.</param>
     /// <param name="aspectRatio">Choices the symbol, it is possible encode the same data in two forms of Data Matrix, a square form or rectangular.</param>
     /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
-    public static byte[] DataMatrixWrite(int left, int top, ElementDrawRotation rotation, int height, string text, QualityLevel qualityLevel = QualityLevel.ECC_200, AspectRatio aspectRatio = AspectRatio.SQUARE)
+    public static byte[] DataMatrixWrite(int left, int top, ElementDrawRotation rotation, int height, string? text, QualityLevel qualityLevel = QualityLevel.ECC_200, AspectRatio aspectRatio = AspectRatio.SQUARE)
     {
+        if (string.IsNullOrEmpty(text)) return Array.Empty<byte>();
         var rotationValue = (char)rotation;
         var qualityLevelValue = (int)qualityLevel;
         var aspectRatioValue = (int)aspectRatio;
@@ -94,9 +96,9 @@ public partial class ZPLCommands
     /// <param name="text">Text to be encoded</param>
     /// <param name="qualityLevel">Error correction (L, M, Q or H).</param>
     /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
-    public static byte[] QRCodeWrite(int left, int top, int magnificationFactor, string text, string qualityLevel = "M")
+    public static byte[] QRCodeWrite(int left, int top, int magnificationFactor, string? text, string qualityLevel = "M")
     {
-        return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BQN,2,{magnificationFactor},{qualityLevel},^FD{qualityLevel}A,{text}^FS");
+        return string.IsNullOrEmpty(text) ? Array.Empty<byte>() : Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BQN,2,{magnificationFactor},{qualityLevel},^FD{qualityLevel}A,{text}^FS");
     }
 
     /// <summary>
@@ -115,7 +117,7 @@ public partial class ZPLCommands
     /// <param name="codepage">The text encoding page the printer is set to use</param>
     /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
     [Obsolete("Use ZPLFont instead of ZebraFont.")]
-    public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font, int height, int width = 0, string text = "", int codepage = 850)
+    public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, ZebraFont font, int height, int width = 0, string? text = null, int codepage = 850)
     {
         return string.IsNullOrEmpty(text)
             ? Array.Empty<byte>()
@@ -160,7 +162,7 @@ public partial class ZPLCommands
     /// <param name="text">Text to be written</param>                            
     /// <param name="codepage">The text encoding page the printer is set to use</param>
     /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
-    public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, string fontName, char storageArea, int height, string text, int codepage = 850)
+    public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, string fontName, char storageArea, int height, string? text, int codepage = 850)
     {
         var rotationValue = (char)rotation;
         return string.IsNullOrEmpty(text)
@@ -180,7 +182,7 @@ public partial class ZPLCommands
     /// <param name="text">Text to be written</param>                            
     /// <param name="codepage">The text encoding page the printer is set to use</param>
     /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
-    public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, int height, string text, int codepage = 850)
+    public static byte[] TextWrite(int left, int top, ElementDrawRotation rotation, int height, string? text, int codepage = 850)
     {
         //uses last specified font
         return string.IsNullOrEmpty(text)
@@ -254,10 +256,10 @@ public partial class ZPLCommands
             $"^FO{left},{top}^GB{Math.Max(width, lineThickness)},{Math.Max(height, lineThickness)},{lineThickness},,{rounding}^FS");
     }
 
-    private static string FixTilde(string text)
+    private static string? FixTilde(string? text)
     {
         if (string.IsNullOrEmpty(text)) return text;
-        if (!text.Contains("~"))
+        if (!text!.Contains("~"))
             return $"^FD{text}^FS";
         if (text.Contains("_"))
             throw new ArgumentException("Tilde character is not supported with underscore in same command");
