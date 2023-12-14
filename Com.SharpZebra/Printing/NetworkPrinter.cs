@@ -1,26 +1,29 @@
 ﻿using System.Net.Sockets;
 
-namespace SharpZebra.Printing;
-
-
-public class NetworkPrinter : IZebraPrinter
+namespace SharpZebra.Printing
 {
-    public PrinterSettings Settings { get; set; }
 
-    public NetworkPrinter(PrinterSettings settings)
+    public class NetworkPrinter : IZebraPrinter
     {
-        Settings = settings;
-    }
+        public PrinterSettings Settings { get; set; }
 
-    public bool? Print(byte[] data)
-    {
-        using var printer = new TcpClient(Settings.PrinterName, Settings.PrinterPort);
-        using (var stream = printer.GetStream())
+        public NetworkPrinter(PrinterSettings settings)
         {
-            stream.Write(data, 0, data.Length);
-            stream.Close();
+            Settings = settings;
         }
-        printer.Close();
-        return null;
+
+        public bool? Print(byte[] data)
+        {
+            using (var printer = new TcpClient(Settings.PrinterName, Settings.PrinterPort))
+            {
+                using (var stream = printer.GetStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                    stream.Close();
+                }
+                printer.Close();
+            }
+            return null;
+        }
     }
 }
