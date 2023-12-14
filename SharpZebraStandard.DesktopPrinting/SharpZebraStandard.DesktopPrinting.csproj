@@ -54,12 +54,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Com.SharpZebra\Printing\SpoolPrinter.cs">
-      <Link>Printing\SpoolPrinter.cs</Link>
-    </Compile>
-    <Compile Include="..\Com.SharpZebra\Printing\USBPrinter.cs">
-      <Link>Printing\USBPrinter.cs</Link>
-    </Compile>
+    <Compile Include="Printing\SpoolPrinter.cs" />
+    <Compile Include="Printing\USBPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
