@@ -1,7 +1,10 @@
+using System.Threading.Tasks;
+
 namespace SharpZebra.Printing;
 
 public interface IZebraPrinter
 {
+    Task<bool> PrintAsync(byte[] data);
     bool? Print(byte[] data);
     PrinterSettings Settings { get; set; }     
 }

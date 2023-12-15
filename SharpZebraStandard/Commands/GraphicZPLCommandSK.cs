@@ -153,7 +153,7 @@ public partial class ZPLCommands
         var drive = ramDrive ?? _printerSettings?.RamDrive ?? 'R';
         res.AddRange(GraphicStore(customString.CustomImage, drive, name));
         res.AddRange(GraphicWrite(left, top, name, drive));
-        return [.. res];
+        return res.ToArray();
     }
 
     public static byte[] GraphicStore(SKBitmap image, char storageArea, string imageName)
@@ -182,6 +182,6 @@ public partial class ZPLCommands
             }
             res.AddRange(Encoding.GetEncoding(850).GetBytes("\n"));
         }
-        return [.. res];
+        return res.ToArray();
     }
 }

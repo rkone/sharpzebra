@@ -1,9 +1,10 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace SharpZebra.Printing
 {
-    public class SpoolPrinter: IZebraPrinter
+    public class SpoolPrinter : IZebraPrinter
     {
         public PrinterSettings Settings { get; set; }
 
@@ -18,6 +19,13 @@ namespace SharpZebra.Printing
             var res = SendBytesToPrinter(Settings.PrinterName, h.AddrOfPinnedObject(), data.Length);
             h.Free();
             return res;
+        }
+
+
+        public Task<bool> PrintAsync(byte[] data)
+        {
+            var res = Print(data);
+            return Task.FromResult(res ?? false);
         }
 
 
@@ -83,5 +91,6 @@ namespace SharpZebra.Printing
             return bSuccess;
 
         }
+
     }
 }

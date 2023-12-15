@@ -32,6 +32,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace SharpZebra.Printing
 {
@@ -52,6 +53,12 @@ namespace SharpZebra.Printing
                 return connector.Send(data, 0, data.Length) == data.Length;
             }
             return false;
+        }
+
+        public Task<bool> PrintAsync(byte[] data)
+        {
+            var res = Print(data);
+            return Task.FromResult(res ?? false);
         }
     }
 
