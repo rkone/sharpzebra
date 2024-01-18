@@ -5,8 +5,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
-    <Version>1.0.6</Version>
-    <PackageReleaseNotes>v1.0.6: QR Code, inverse custom text support from malbach. Fix alignment crash on empty text.</PackageReleaseNotes>
+    <Version>1.1.0</Version>
+    <PackageReleaseNotes>v1.1.0: Added methods to manipulate images using SkiaSharp instead of Windows Specific System.Drawing.Common</PackageReleaseNotes>
     <RootNamespace>SharpZebra</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>SharpZebraSigning.snk</AssemblyOriginatorKeyFile>
@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.88.6" />
+    <PackageReference Include="SkiaSharp" Version="2.88.7" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
   </ItemGroup>
 
