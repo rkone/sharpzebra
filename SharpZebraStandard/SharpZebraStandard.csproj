@@ -5,8 +5,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
-    <Version>1.1.2</Version>
-    <PackageReleaseNotes>v1.1.2: Added SSCC-18 barcode</PackageReleaseNotes>
+    <Version>1.1.4</Version>
+    <PackageReleaseNotes>v1.1.4: Added SSCC-18 barcode</PackageReleaseNotes>
 	<PackageReadmeFile>readme.md</PackageReadmeFile>
     <RootNamespace>SharpZebra</RootNamespace>
     <SignAssembly>true</SignAssembly>

@@ -57,6 +57,8 @@ public partial class ZPLCommands
                                 $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BU{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS"),
             BarcodeType.EAN13 => Encoding.GetEncoding(850).GetBytes(
                                 $"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BE{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS"),
+            BarcodeType.SSCC => Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BC{(char)rotation},{height},{encodedReadable},N,,D^FD{barcodeData}^FS"),
+            
             _ => throw new ArgumentException("Barcode not yet supported by SharpZebra library."),
         };
     }
