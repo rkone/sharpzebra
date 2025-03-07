@@ -13,7 +13,7 @@
     <tags>Zebra Printer Barcode Label</tags>
     <dependencies>
       <group targetFramework=".NETFramework4.7.2" />
-      <dependency id="SharpZebraStandard" version="1.0.4" />
+      <dependency id="SharpZebraStandard" version="1.1.2" />
     </dependencies>
   </metadata>
 </package>

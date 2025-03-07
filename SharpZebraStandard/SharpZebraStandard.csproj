@@ -5,8 +5,9 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
-    <Version>1.1.0</Version>
-    <PackageReleaseNotes>v1.1.0: Added methods to manipulate images using SkiaSharp instead of Windows Specific System.Drawing.Common</PackageReleaseNotes>
+    <Version>1.1.2</Version>
+    <PackageReleaseNotes>v1.1.2: Added SSCC-18 barcode</PackageReleaseNotes>
+	<PackageReadmeFile>readme.md</PackageReadmeFile>
     <RootNamespace>SharpZebra</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>SharpZebraSigning.snk</AssemblyOriginatorKeyFile>
@@ -25,8 +26,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.88.8" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.6" />
+	<None Include="Docs\readme.md" Pack="true" PackagePath="\" />
+    <PackageReference Include="SkiaSharp" Version="2.88.9" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
   </ItemGroup>
 
 </Project>

@@ -57,6 +57,8 @@ namespace SharpZebra.Commands
                     return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BE{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
                 case BarcodeType.UPC_A:
                     return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BU{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
+                case BarcodeType.SSCC:
+                    return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BC{(char)rotation},{height},{encodedReadable},N,,D^FD{barcodeData}^FS");
                 default:
                     throw new ArgumentException("Barcode not yet supported by SharpZebra library.");
             }

@@ -164,7 +164,8 @@ namespace SharpZebra
         UPC_E_5DIGIT_ADDON,
         UPC_INTERLEAVED_2OF5,
         PLESSEY_CHECK,
-        MSI_3_CHECK
+        MSI_3_CHECK,
+        SSCC
     }
 
     public enum Codepage8
@@ -334,11 +335,11 @@ namespace SharpZebra
         private readonly string[] P4ValueList = {"3", "3C", "9", "0", "1", "1A", "1B", "1C", "K", "E80", "E82",
                                            "E85", "E30", "E32", "E35", "2G", "2", "2C", "2D", "P", "J",
                                            "1E", "UA0", "UA2", "UA5", "UE0", "UE2", "UE5", "2U", "L",
-                                           "M"};
+                                           "M", "1E"};
         private readonly int?[] P5MinList = {1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 1, 1, 1, null, null,
-                                                1, 2, 2, 2, 2, 2, 2, 1, null, null};
+                                                1, 2, 2, 2, 2, 2, 2, 1, null, null, null};
         private readonly int?[] P5MaxList = {10, 10, 10, 10, 10, 10, 10, 10, 10, 4, 4, 4, 4, 4, 4, 4, 10, 10, 10,
-                                                null, null, 10, 4, 4, 4, 4, 4, 4, 10, null, null};
+                                                null, null, 10, 4, 4, 4, 4, 4, 4, 10, null, null, null};
 
     }
 }
