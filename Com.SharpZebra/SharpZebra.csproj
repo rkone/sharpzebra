@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net20</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.7</Version>
-    <PackageReleaseNotes>v1.1.7: Added support for Interleaved 2 of 5 bar code</PackageReleaseNotes>
+    <Version>1.1.9</Version>
+    <PackageReleaseNotes>v1.1.9: Added circle, ellipse and graphic symbol drawing, field reverse, label length setting, and EAN-8, UPC-E, Code 93, PDF417 and Aztec barcodes. Added XML documentation for all public methods.</PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
     <Authors>rkone</Authors>
     <Company>rkone</Company>
