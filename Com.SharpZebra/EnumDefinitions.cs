@@ -177,7 +177,8 @@ namespace SharpZebra
         UPC_INTERLEAVED_2OF5,
         PLESSEY_CHECK,
         MSI_3_CHECK,
-        SSCC
+        SSCC,
+        GTIN14
     }
 
     public enum Codepage8
@@ -254,6 +255,14 @@ namespace SharpZebra
         RECTANGULAR = 2
     }
 
+    public enum BearerBarType
+    {
+        NONE,
+        ABUTTING,
+        ENCLOSING,
+        HORIZONTAL
+    }
+
     public static class FontCharset
     {
         public static readonly string[] CharList = {"0123456789.- ",
@@ -299,18 +308,24 @@ namespace SharpZebra
                 P4Value = P4ValueList[(int)type];
                 BarWidthNarrowMin = P5MinList[(int)type];
                 BarWidthNarrowMax = P5MaxList[(int)type];
-                if (!P5MinList[(int)type].Equals(null))
-                {
-                    barWidthNarrow = P5MinList[(int)type] == 1 ? 2 : P5MinList[(int)type];
-                    barWidthWide = 4;
-                }
-                else
+                if (BarWidthNarrowMin is null)
                 {
                     barWidthNarrow = null;
                     barWidthWide = 4;
                 }
+                else
+                {
+                    //narrow bar defaults to the type's minimum, but no less than 2 dots
+                    barWidthNarrow = Math.Max(BarWidthNarrowMin.Value, 2);
+                    //3:1 is the standard wide:narrow ratio for ratio-based symbologies (Code 39, Interleaved 2 of 5, Codabar)
+                    barWidthWide = barWidthNarrow.Value * 3;
+                }
             }
         }
+
+        public BearerBarType BearerBars { get; set; } = BearerBarType.NONE;
+        public int BearerBarWidth { get; set; }
+
         public string P4Value { get; private set; }
         public int? BarWidthNarrowMin { get; private set; }
         public int? BarWidthNarrowMax { get; private set; }
@@ -347,11 +362,11 @@ namespace SharpZebra
         private readonly string[] P4ValueList = {"3", "3C", "9", "0", "1", "1A", "1B", "1C", "K", "E80", "E82",
                                            "E85", "E30", "E32", "E35", "2G", "2", "2C", "2D", "P", "J",
                                            "1E", "UA0", "UA2", "UA5", "UE0", "UE2", "UE5", "2U", "L",
-                                           "M", "1E"};
+                                           "M", "1E", "2U"};
         private readonly int?[] P5MinList = {1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 1, 1, 1, null, null,
-                                                1, 2, 2, 2, 2, 2, 2, 1, null, null, null};
+                                                1, 2, 2, 2, 2, 2, 2, 4, null, null, null, 4};
         private readonly int?[] P5MaxList = {10, 10, 10, 10, 10, 10, 10, 10, 10, 4, 4, 4, 4, 4, 4, 4, 10, 10, 10,
-                                                null, null, 10, 4, 4, 4, 4, 4, 4, 10, null, null, null};
+                                                null, null, 10, 4, 4, 4, 4, 4, 4, 10, null, null, null, 10};
 
     }
 }
