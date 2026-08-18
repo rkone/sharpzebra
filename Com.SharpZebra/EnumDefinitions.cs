@@ -132,6 +132,18 @@ namespace SharpZebra
         STANDARD_BOLD6         //V
     }
 
+    /// <summary>
+    /// Symbols printable with the ^GS (Graphic Symbol) command
+    /// </summary>
+    public enum ZPLSymbol
+    {
+        REGISTERED_TRADEMARK = 'A',  //®
+        COPYRIGHT = 'B',             //©
+        TRADEMARK = 'C',             //™
+        UL_APPROVAL = 'D',           //Underwriters Laboratories mark
+        CSA_APPROVAL = 'E'           //Canadian Standards Association mark
+    }
+
     public enum BarcodeType
     {
         CODE39_STD_EXT = 0,

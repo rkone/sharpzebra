@@ -7,7 +7,11 @@ namespace SharpZebra.Commands;
 
 public partial class EPLCommands
 {
-    //return the width of each character in dots 
+    /// <summary>
+    /// Measures the printed width of every character (0-255) in the given font.
+    /// </summary>
+    /// <param name="font">Font to measure. Its size is treated as points (72dpi) and scaled to the printer's 203dpi</param>
+    /// <returns>A 256-entry table of character widths in dots, indexed by character code</returns>
     public static int[] CustomFontCharacterWidth(SKFont font)
     {
         var width = new int[256];
@@ -22,6 +26,16 @@ public partial class EPLCommands
         return width;
     }
 
+    /// <summary>
+    /// Renders a font and uploads it to the printer as a custom EPL font, replacing any font already
+    /// stored under the same name. Only the characters in the chosen charset are rendered and uploaded.
+    /// EPL Commands: EK, ES.
+    /// </summary>
+    /// <param name="font">Font to render and upload. Its size is treated as points (72dpi) and scaled to the printer's 203dpi</param>
+    /// <param name="name">Name to store the font under (CUSTOM_A through CUSTOM_Z)</param>
+    /// <param name="rotation">Which orientations to upload the font in (portrait, landscape or both)</param>
+    /// <param name="charset">Which set of characters to upload</param>
+    /// <returns>Array of bytes containing EPL2 data to be sent to the Zebra printer.</returns>
     public static byte[] CustomFontStore(SKFont font, ZebraFont name, ElementUploadRotation rotation, FontCharsetType charset)
     {
         if (name < ZebraFont.CUSTOM_A)

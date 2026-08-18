@@ -26,6 +26,9 @@ public class PrinterSettings
     public int Length { get; set; }
     public char RamDrive { get; set; }
 
+    /// <summary>
+    /// Creates printer settings with the defaults: RAM drive 'R', slew and backfeed speed 12.
+    /// </summary>
     public PrinterSettings()
     {
         RamDrive = 'R';

@@ -7,6 +7,12 @@ namespace SharpZebra.Commands;
 
 public partial class EPLCommands
 {
+    /// <summary>
+    /// Deletes a previously uploaded custom font from the printer. Use ZebraFont.CUSTOM_ALL to delete all custom fonts.
+    /// EPL Command: EK.
+    /// </summary>
+    /// <param name="name">The custom font to delete (CUSTOM_A through CUSTOM_Z, or CUSTOM_ALL)</param>
+    /// <returns>Array of bytes containing EPL2 data to be sent to the Zebra printer.</returns>
     public static byte[] CustomFontDelete(ZebraFont name)
     {
         if (name != ZebraFont.CUSTOM_ALL && name < ZebraFont.CUSTOM_A)
@@ -16,6 +22,13 @@ public partial class EPLCommands
         return System.Text.Encoding.GetEncoding(437).GetBytes("EK\"" + (char)name + "\"\n");
     }
 
+    /// <summary>
+    /// Truncates text to the longest leading substring that fits within the given width.
+    /// </summary>
+    /// <param name="text">Text to truncate</param>
+    /// <param name="maxWidth">Maximum width in dots</param>
+    /// <param name="charWidths">Per-character width table, as returned by CustomFontCharacterWidth</param>
+    /// <returns>The portion of the text that fits within maxWidth</returns>
     public static string CustomFontCut(string text, int maxWidth, int[] charWidths)
     {
         var i = 0;
@@ -34,6 +47,14 @@ public partial class EPLCommands
         return cutLen < 0 ? text : text.Substring(0, cutLen);
     }
 
+    /// <summary>
+    /// Word-wraps text into lines that each fit within the given width, breaking after
+    /// spaces and hyphens where possible and mid-word otherwise.
+    /// </summary>
+    /// <param name="text">Text to wrap</param>
+    /// <param name="maxWidth">Maximum line width in dots</param>
+    /// <param name="charWidths">Per-character width table, as returned by CustomFontCharacterWidth</param>
+    /// <returns>The text split into lines that each fit within maxWidth</returns>
     public static string[] CustomFontCutToFit(string text, int maxWidth, int[] charWidths)
     {
         var i = 0;
@@ -68,6 +89,12 @@ public partial class EPLCommands
         return result.ToArray();
     }
 
+    /// <summary>
+    /// Calculates the printed width of a string from a per-character width table.
+    /// </summary>
+    /// <param name="text">Text to measure</param>
+    /// <param name="charWidths">Per-character width table, as returned by CustomFontCharacterWidth</param>
+    /// <returns>Width of the text in dots</returns>
     public static int CustomFontTextWidth(string text, int[] charWidths)
     {
         var i = 0;
@@ -78,12 +105,26 @@ public partial class EPLCommands
         return i;
     }
 
+    /// <summary>
+    /// Calculates the printed width of a string in the given font.
+    /// Note: measuring the font is expensive; if measuring many strings, call
+    /// CustomFontCharacterWidth once and use the charWidths overload instead.
+    /// </summary>
+    /// <param name="text">Text to measure</param>
+    /// <param name="font">Font the text will be rendered with</param>
+    /// <returns>Width of the text in dots</returns>
     public static int CustomFontTextWidth(string text, Font font)
     {
         return CustomFontTextWidth(text, CustomFontCharacterWidth(font));
     }
 
     //Doesn't do a good job at calculating the width, but better than nothing...
+    /// <summary>
+    /// Measures the approximate printed width of every character (0-255) in the given font
+    /// by rendering each one and scanning its pixels.
+    /// </summary>
+    /// <param name="font">Font to measure</param>
+    /// <returns>A 256-entry table of character widths in dots, indexed by character code</returns>
     public static int[] CustomFontCharacterWidth(Font font)
     {
         //used w/ 84 dpi monitor (?)
@@ -118,6 +159,17 @@ public partial class EPLCommands
         return width;
     }
 
+    /// <summary>
+    /// Renders a font at its current size and uploads it to the printer as a custom EPL font,
+    /// replacing any font already stored under the same name. Only the characters in the chosen
+    /// charset are rendered and uploaded.
+    /// EPL Commands: EK, ES.
+    /// </summary>
+    /// <param name="font">Font to render and upload</param>
+    /// <param name="name">Name to store the font under (CUSTOM_A through CUSTOM_Z)</param>
+    /// <param name="rotation">Which orientations to upload the font in (portrait, landscape or both)</param>
+    /// <param name="charset">Which set of characters to upload</param>
+    /// <returns>Array of bytes containing EPL2 data to be sent to the Zebra printer.</returns>
     public static byte[] CustomFontStore(Font font, ZebraFont name, ElementUploadRotation rotation, FontCharsetType charset)
     {
         if (name < ZebraFont.CUSTOM_A)

@@ -121,10 +121,13 @@ public partial class ZPLCommands
             }
         }
 
+        /// <summary>
+        /// Releases the rendered image held by this CustomString.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this); 
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -157,12 +160,33 @@ public partial class ZPLCommands
         return CustomStringWrite(left, top, s, ramDrive);
     }
 
+    /// <summary>
+    /// Same as CustomStringWrite, but prints the text inverted (white text on a black background).
+    /// Note that if your printer's RAM drive letter is something other than 'R', set the ramDrive variable or call ClearPrinter first!
+    /// </summary>
+    /// <param name="left">Distance in dots from the left of the label</param>
+    /// <param name="top">Distance in dots to the top of the label</param>
+    /// <param name="rotation">Rotate field.</param>
+    /// <param name="font">Font to render the text with</param>
+    /// <param name="text">Text to be written</param>
+    /// <param name="ramDrive">Location of your printer's ram drive</param>
+    /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer</returns>
     public static byte[] CustomInverseStringWrite(int left, int top, ElementDrawRotation rotation, Font font, string text, char? ramDrive = null)
     {
         var s = new CustomString { Font = font, Rotation = rotation, Text = text, Inverse = true };
         return CustomStringWrite(left, top, s, ramDrive);
     }
 
+    /// <summary>
+    /// Writes a pre-built CustomString to the printer: its rendered image is uploaded to the printer's
+    /// RAM drive under a generated name and then placed on the label.
+    /// Note that if your printer's RAM drive letter is something other than 'R', set the ramDrive variable or call ClearPrinter first!
+    /// </summary>
+    /// <param name="left">Distance in dots from the left of the label</param>
+    /// <param name="top">Distance in dots to the top of the label</param>
+    /// <param name="customString">The text, font, rotation and inversion to print</param>
+    /// <param name="ramDrive">Location of your printer's ram drive</param>
+    /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer</returns>
     public static byte[] CustomStringWrite(int left, int top, CustomString customString, char? ramDrive = null)
     {
         if (customString.CustomImage is null) throw new ArgumentException("Image has not been set for custom string.");
@@ -175,11 +199,31 @@ public partial class ZPLCommands
         return res.ToArray();
     }
 
+    /// <summary>
+    /// Prints a graphic previously stored on the printer with GraphicStore.
+    /// ZPL Command: ^XG.
+    /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+    /// </summary>
+    /// <param name="left">Distance in dots from the left of the label</param>
+    /// <param name="top">Distance in dots to the top of the label</param>
+    /// <param name="imageName">Name the graphic was stored under</param>
+    /// <param name="storageArea">The drive the graphic is stored on</param>
+    /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
     public static byte[] GraphicWrite(int left, int top, string imageName, char storageArea)
     {
         return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^XG{storageArea}:{imageName}.GRF^FS");
     }
 
+    /// <summary>
+    /// Uploads a bitmap to the printer's memory as a 1-bit .GRF graphic. Pixels are converted using
+    /// the image's red channel (red below 128 = black); no dithering is done.
+    /// ZPL Command: ~DG.
+    /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+    /// </summary>
+    /// <param name="image">Image to upload</param>
+    /// <param name="storageArea">The drive to store the graphic on</param>
+    /// <param name="imageName">Name to store the graphic under</param>
+    /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
     public static byte[] GraphicStore(Bitmap image, char storageArea, string imageName)
     {
         //Note that we're using the RED channel to determine if each pixel of an image is enabled.  
@@ -209,6 +253,14 @@ public partial class ZPLCommands
         return res.ToArray();
     }
 
+    /// <summary>
+    /// Deletes a graphic stored on the printer.
+    /// ZPL Command: ^ID.
+    /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+    /// </summary>
+    /// <param name="storageArea">The drive the graphic is stored on</param>
+    /// <param name="imageName">Name the graphic was stored under</param>
+    /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
     public static byte[] GraphicDelete(char storageArea, string imageName)
     {
         return Encoding.GetEncoding(850).GetBytes($"^ID{storageArea}:{imageName}.GRF^FS");

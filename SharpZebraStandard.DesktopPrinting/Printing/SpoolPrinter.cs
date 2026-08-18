@@ -8,11 +8,20 @@ namespace SharpZebra.Printing
     {
         public PrinterSettings Settings { get; set; }
 
+        /// <summary>
+        /// Creates a printer that sends raw data to a printer installed in Windows via the print spooler.
+        /// </summary>
+        /// <param name="settings">Settings identifying the printer: PrinterName is the name of the installed Windows printer</param>
         public SpoolPrinter(PrinterSettings settings)
         {
             Settings = settings;
         }
 
+        /// <summary>
+        /// Sends the given data to the printer as a RAW spooler document.
+        /// </summary>
+        /// <param name="data">The EPL2/ZPLII bytes to send</param>
+        /// <returns>True if the data was accepted by the spooler, false otherwise</returns>
         public bool? Print(byte[] data)
         {
             var h = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -22,6 +31,11 @@ namespace SharpZebra.Printing
         }
 
 
+        /// <summary>
+        /// Sends the given data to the printer. The spooler API is synchronous, so this simply wraps Print.
+        /// </summary>
+        /// <param name="data">The EPL2/ZPLII bytes to send</param>
+        /// <returns>True if the data was accepted by the spooler, false otherwise</returns>
         public Task<bool> PrintAsync(byte[] data)
         {
             var res = Print(data);

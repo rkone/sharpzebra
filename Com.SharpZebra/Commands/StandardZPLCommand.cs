@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SharpZebra.Commands
 {
@@ -19,7 +20,8 @@ namespace SharpZebra.Commands
             _stringCounter = 0;
             _printerSettings = settings;
             return Encoding.GetEncoding(850).GetBytes(
-                $"^XA^MMT^PR{settings.PrintSpeed},{settings.SlewSpeed},{settings.BackfeedSpeed}~TA{settings.AlignTearOff:000}^LH{settings.AlignLeft},{settings.AlignTop}~SD{settings.Darkness:00}^PW{settings.Width + settings.AlignLeft}");
+                $"^XA^MMT^PR{settings.PrintSpeed},{settings.SlewSpeed},{settings.BackfeedSpeed}~TA{settings.AlignTearOff:000}^LH{settings.AlignLeft},{settings.AlignTop}~SD{settings.Darkness:00}^PW{settings.Width + settings.AlignLeft}" +
+                (settings.Length > 0 ? $"^LL{settings.Length}" : ""));
         }
 
         /// <summary>
@@ -33,7 +35,7 @@ namespace SharpZebra.Commands
         }
 
         /// <summary>
-        /// Instruct the Zebra printer to print a barcode.  Currently only 3of9, Code128, UPC_A and EAN13 are supported.
+        /// Instruct the Zebra printer to print a barcode.  Currently only 3of9, Code93, Code128, UPC_A, UPC_E, EAN8, EAN13 and SSCC are supported.
         /// </summary>
         /// <param name="left">Distance in dots from the left of the label</param>
         /// <param name="top">Distance in dots to the top of the label</param>
@@ -57,6 +59,12 @@ namespace SharpZebra.Commands
                     return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BE{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
                 case BarcodeType.UPC_A:
                     return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BU{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
+                case BarcodeType.EAN8:
+                    return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^B8{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
+                case BarcodeType.UPC_E:
+                    return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^B9{(char)rotation},{height},{encodedReadable}^FD{barcodeData}^FS");
+                case BarcodeType.CODE93:
+                    return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BA{(char)rotation},{height},{encodedReadable},N,N^FD{barcodeData}^FS");
                 case BarcodeType.SSCC:
                     return Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BY{barcode.BarWidthNarrow}^BC{(char)rotation},{height},{encodedReadable},N,,D^FD{barcodeData}^FS");
 
@@ -103,6 +111,50 @@ namespace SharpZebra.Commands
         public static byte[] QRCodeWrite(int left, int top, int magnificationFactor, string text, string qualityLevel = "M")
         {
             return string.IsNullOrEmpty(text) ? new byte[0] : Encoding.GetEncoding(850).GetBytes($"^FO{left},{top}^BQN,2,{magnificationFactor},{qualityLevel},^FD{qualityLevel}A,{text}^FS");
+        }
+
+        /// <summary>
+        /// Writes a PDF417 barcode for ZPL.
+        /// ZPL Command: ^B7.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+        /// </summary>
+        /// <param name="left">Horizontal axis.</param>
+        /// <param name="top">Vertical axis.</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="rowHeight">Height of an individual row in dots. Total symbol height is rowHeight x rows.</param>
+        /// <param name="text">Text to be encoded</param>
+        /// <param name="securityLevel">Error correction level, 1-8. Each level doubles the error correction codewords. 0 uses the printer default of error detection only.</param>
+        /// <param name="columns">Number of data columns, 1-30, or 0 to let the printer pick a 1:2 row-to-column aspect ratio</param>
+        /// <param name="rows">Number of rows, 3-90, or 0 to let the printer pick</param>
+        /// <param name="truncate">Print in truncated mode (right row indicators and stop pattern omitted)</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] PDF417Write(int left, int top, ElementDrawRotation rotation, int rowHeight, string text, int securityLevel = 0, int columns = 0, int rows = 0, bool truncate = false)
+        {
+            if (string.IsNullOrEmpty(text)) return new byte[0];
+            var columnsValue = columns > 0 ? columns.ToString() : "";
+            var rowsValue = rows > 0 ? rows.ToString() : "";
+            return Encoding.GetEncoding(850).GetBytes(
+                $"^FO{left},{top}^B7{(char)rotation},{rowHeight},{securityLevel},{columnsValue},{rowsValue},{(truncate ? "Y" : "N")}^FD{text}^FS");
+        }
+
+        /// <summary>
+        /// Writes an Aztec barcode for ZPL.
+        /// ZPL Command: ^B0.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+        /// </summary>
+        /// <param name="left">Horizontal axis.</param>
+        /// <param name="top">Vertical axis.</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="magnification">Scale of the symbol, 1 to 10</param>
+        /// <param name="text">Text to be encoded</param>
+        /// <param name="errorControl">0 for default error correction, 1-99 for a minimum error correction percentage,
+        /// 101-104 to force a compact symbol of that many layers, 201-232 to force a full-range symbol of that many layers, 300 for a simple rune</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] AztecWrite(int left, int top, ElementDrawRotation rotation, int magnification, string text, int errorControl = 0)
+        {
+            if (string.IsNullOrEmpty(text)) return new byte[0];
+            return Encoding.GetEncoding(850).GetBytes(
+                $"^FO{left},{top}^B0{(char)rotation},{magnification},N,{errorControl},N,1^FD{text}^FS");
         }
 
         /// <summary>
@@ -235,6 +287,18 @@ namespace SharpZebra.Commands
             return stream.ToArray();
         }
 
+        /// <summary>
+        /// Draws a line between two points. Vertical and horizontal lines are drawn with the ^GB (Graphic Box)
+        /// command as ZPL requires; anything else is drawn with ^GD (Graphic Diagonal Line).
+        /// ZPL Commands: ^GB, ^GD.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+        /// </summary>
+        /// <param name="left">Distance in dots from the left of the label to the start of the line</param>
+        /// <param name="top">Distance in dots from the top of the label to the start of the line</param>
+        /// <param name="lineThickness">Thickness of the line in dots</param>
+        /// <param name="right">Distance in dots from the left of the label to the end of the line</param>
+        /// <param name="bottom">Distance in dots from the top of the label to the end of the line</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
         public static byte[] LineWrite(int left, int top, int lineThickness, int right, int bottom)
         {
             var height = top - bottom;
@@ -254,10 +318,90 @@ namespace SharpZebra.Commands
             return Encoding.GetEncoding(850).GetBytes($"^FO{l},{t}^GD{width},{height},{lineThickness},,{diagonal}^FS");
         }
 
+        /// <summary>
+        /// Draws a box, optionally with rounded corners. A line thickness matching the width or height draws a solid box.
+        /// ZPL Command: ^GB.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+        /// </summary>
+        /// <param name="left">Distance in dots from the left of the label</param>
+        /// <param name="top">Distance in dots to the top of the label</param>
+        /// <param name="lineThickness">Border thickness in dots</param>
+        /// <param name="width">Width of the box in dots</param>
+        /// <param name="height">Height of the box in dots</param>
+        /// <param name="rounding">Degree of corner rounding, 0 (none) to 8 (heaviest)</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
         public static byte[] BoxWrite(int left, int top, int lineThickness, int width, int height, int rounding)
         {
             return Encoding.GetEncoding(850).GetBytes(
                 $"^FO{left},{top}^GB{Math.Max(width, lineThickness)},{Math.Max(height, lineThickness)},{lineThickness},,{rounding}^FS");
+        }
+
+        /// <summary>
+        /// Draws a circle.
+        /// ZPL Command: ^GC.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf#page=139"/>
+        /// </summary>
+        /// <param name="left">Distance in dots from the left of the label to the left edge of the circle</param>
+        /// <param name="top">Distance in dots from the top of the label to the top edge of the circle</param>
+        /// <param name="lineThickness">Border thickness in dots. A thickness of at least half the diameter draws a solid circle</param>
+        /// <param name="diameter">Diameter of the circle in dots (3-4095)</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] CircleWrite(int left, int top, int lineThickness, int diameter)
+        {
+            return Encoding.GetEncoding(850).GetBytes(
+                $"^FO{left},{top}^GC{diameter},{Math.Min(lineThickness, (diameter + 1) / 2)},B^FS");
+        }
+
+        /// <summary>
+        /// Draws an ellipse.
+        /// ZPL Command: ^GE.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+        /// </summary>
+        /// <param name="left">Distance in dots from the left of the label to the left edge of the ellipse</param>
+        /// <param name="top">Distance in dots from the top of the label to the top edge of the ellipse</param>
+        /// <param name="lineThickness">Border thickness in dots. A thickness of at least half the smaller dimension draws a solid ellipse</param>
+        /// <param name="width">Width of the ellipse in dots (3-4095)</param>
+        /// <param name="height">Height of the ellipse in dots (3-4095)</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] EllipseWrite(int left, int top, int lineThickness, int width, int height)
+        {
+            return Encoding.GetEncoding(850).GetBytes(
+                $"^FO{left},{top}^GE{width},{height},{Math.Min(lineThickness, (Math.Min(width, height) + 1) / 2)},B^FS");
+        }
+
+        /// <summary>
+        /// Prints a graphic symbol (®, ©, ™ or the UL/CSA certification marks), which cannot be produced through normal text fields.
+        /// ZPL Command: ^GS.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+        /// </summary>
+        /// <param name="left">Distance in dots from the left of the label</param>
+        /// <param name="top">Distance in dots to the top of the label</param>
+        /// <param name="rotation">Rotate field.</param>
+        /// <param name="symbol">The symbol to print</param>
+        /// <param name="height">Height of the symbol in dots</param>
+        /// <param name="width">Width of the symbol in dots, default or 0 to match the height</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] SymbolWrite(int left, int top, ElementDrawRotation rotation, ZPLSymbol symbol, int height, int width = 0)
+        {
+            return Encoding.GetEncoding(850).GetBytes(
+                $"^FO{left},{top}^GS{(char)rotation},{height},{(width > 0 ? width : height)}^FD{(char)symbol}^FS");
+        }
+
+        /// <summary>
+        /// Marks every field of a previously generated command as reversed: where the field overlaps
+        /// something already drawn in black it prints white, and vice versa. Combine with BoxWrite to
+        /// print white-on-black text, e.g. FieldReverse(TextWrite(...)) over a solid box.
+        /// ZPL Command: ^FR.
+        /// Manual: <see href="https://www.zebra.com/content/dam/zebra/manuals/printers/common/programming/zpl-zbi2-pm-en.pdf"/>
+        /// </summary>
+        /// <param name="fieldCommand">Results of another command, e.g. TextWrite, BoxWrite or BarCodeWrite</param>
+        /// <returns>Array of bytes containing ZPLII data to be sent to the Zebra printer.</returns>
+        public static byte[] FieldReverse(byte[] fieldCommand)
+        {
+            if (fieldCommand.Length == 0) return fieldCommand;
+            //codepage 850 maps all 256 byte values, so the round trip preserves text in any single-byte codepage
+            var zpl = Encoding.GetEncoding(850).GetString(fieldCommand);
+            return Encoding.GetEncoding(850).GetBytes(Regex.Replace(zpl, @"\^FO-?\d+,-?\d+", "$0^FR"));
         }
 
         private static string FixTilde(string text)

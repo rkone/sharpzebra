@@ -39,11 +39,21 @@ namespace SharpZebra.Printing
     {
         public PrinterSettings Settings { get; set; }
 
+        /// <summary>
+        /// Creates a printer that sends data directly to a USB-attached Zebra printer through the
+        /// Windows usbprint device interface, bypassing the print spooler.
+        /// </summary>
+        /// <param name="settings">Settings identifying the printer: PrinterName is matched against the connected USB printer devices</param>
         public USBPrinter(PrinterSettings settings)
         {
             Settings = settings;
         }
 
+        /// <summary>
+        /// Sends the given data to the printer.
+        /// </summary>
+        /// <param name="data">The EPL2/ZPLII bytes to send</param>
+        /// <returns>True if all bytes were sent, false if the printer could not be opened</returns>
         public bool? Print(byte[] data)
         {
             var connector = new UsbPrinterConnector(Settings.PrinterName);
@@ -202,11 +212,22 @@ namespace SharpZebra.Printing
             }
         }
 
+        /// <summary>
+        /// Opens the connection to the USB printer.
+        /// </summary>
+        /// <returns>True if the printer is online and the connection was opened, false otherwise</returns>
         public bool BeginSend()
         {
             return GetConnected();
         }
 
+        /// <summary>
+        /// Writes data to the USB printer, splitting it into 4096-byte blocks as required by USB 1.1.
+        /// </summary>
+        /// <param name="buffer">Data to send</param>
+        /// <param name="offset">Offset into the buffer to start sending from</param>
+        /// <param name="count">Number of bytes to send</param>
+        /// <returns>The number of bytes actually written</returns>
         public int Send(byte[] buffer, int offset, int count)
         {
             // USB 1.1 WriteFile maximum block size is 4096
@@ -244,6 +265,11 @@ namespace SharpZebra.Printing
             return (int)size;
         }
 
+        /// <summary>
+        /// Reads any data the printer has sent back (e.g. status responses).
+        /// </summary>
+        /// <param name="buffer">Receives the bytes read from the printer</param>
+        /// <returns>The number of bytes read</returns>
         public int Read(out byte[] buffer)
         {
             // USB 1.1 ReadFile in block chunks of 64 bytes

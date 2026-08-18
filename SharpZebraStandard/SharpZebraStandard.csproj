@@ -5,8 +5,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
-    <Version>1.1.8</Version>
-    <PackageReleaseNotes>v1.1.8: Added GTIN-14 bar code. Added Bearer Bars for all barcodes. Updated SkiaSharp to v4.15.1</PackageReleaseNotes>
+    <Version>1.1.9</Version>
+    <PackageReleaseNotes>v1.1.9: Added circle, ellipse and graphic symbol drawing, field reverse, label length setting, and EAN-8, UPC-E, Code 93, PDF417 and Aztec barcodes. Added XML documentation for all public methods.</PackageReleaseNotes>
 	<PackageReadmeFile>readme.md</PackageReadmeFile>
     <RootNamespace>SharpZebra</RootNamespace>
     <SignAssembly>true</SignAssembly>
