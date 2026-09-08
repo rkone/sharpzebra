@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net20</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.9</Version>
-    <PackageReleaseNotes>v1.1.9: Added circle, ellipse and graphic symbol drawing, field reverse, label length setting, and Interleaved 2 of 5, GTIN-14, EAN-8, UPC-E, Code 93, PDF417 and Aztec barcodes. Added Bearer Bars for all barcodes. Added XML documentation for all public methods.</PackageReleaseNotes>
+    <Version>1.2.0</Version>
+    <PackageReleaseNotes>v1.2.0: Added FontStore to upload TrueType (.TTF) fonts to the printer, and FontDelete to remove them.</PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
     <Authors>rkone</Authors>
     <Company>rkone</Company>
