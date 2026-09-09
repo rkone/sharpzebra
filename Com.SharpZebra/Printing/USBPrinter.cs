@@ -32,6 +32,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.IO;
 
 namespace SharpZebra.Printing
 {
@@ -62,6 +63,38 @@ namespace SharpZebra.Printing
                 return connector.Send(data, 0, data.Length) == data.Length;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Sends data to the printer and returns whatever the printer sends back, for host commands such as
+        /// ^HW (directory listing) or ~HS (status). Reading stops once the printer has replied and then been quiet
+        /// for half a second, or when the timeout passes with no reply.
+        /// </summary>
+        /// <param name="data">The EPL2/ZPLII bytes to send</param>
+        /// <param name="timeoutMilliseconds">How long to wait for the printer to start replying</param>
+        /// <returns>The raw response bytes, or null if the printer could not be opened or did not reply in time</returns>
+        public byte[] Query(byte[] data, int timeoutMilliseconds = 5000)
+        {
+            const int idleTimeoutMilliseconds = 500;
+            var connector = new UsbPrinterConnector(Settings.PrinterName);
+            if (!connector.BeginSend() || connector.Send(data, 0, data.Length) != data.Length)
+                return null;
+
+            var response = new MemoryStream();
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMilliseconds);
+            connector.ReadTimeout = idleTimeoutMilliseconds;
+            while (true)
+            {
+                var read = connector.Read(out var buffer);
+                if (read > 0)
+                {
+                    response.Write(buffer, 0, read);
+                    continue;
+                }
+                // Nothing arrived within one idle period: done if the printer already replied, or if we've waited long enough
+                if (response.Length > 0 || DateTime.UtcNow >= deadline) break;
+            }
+            return response.Length == 0 ? null : response.ToArray();
         }
     }
 
@@ -288,12 +321,14 @@ namespace SharpZebra.Printing
 
             if (!FileIO.ReadFile(_usbHandle, _readBuffer, ReadBufferSize, out var read, ref ov))
             {
-                if (Marshal.GetLastWin32Error() == FileIO.ERROR_IO_PENDING)
-                    sg.WaitOne(ReadTimeout, false);
-                else
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                var error = Marshal.GetLastWin32Error();
+                if (error != FileIO.ERROR_IO_PENDING)
+                    throw new Win32Exception(error);
+                if (!sg.WaitOne(ReadTimeout, false))
+                    FileIO.CancelIo(_usbHandle); // nothing arrived in time: abandon the read so GetOverlappedResult returns instead of blocking
             }
-            FileIO.GetOverlappedResult(_usbHandle, ref ov, out read, true);
+            if (!FileIO.GetOverlappedResult(_usbHandle, ref ov, out read, true))
+                read = 0; // cancelled
             buffer = new byte[read];
             Array.Copy(_readBuffer, buffer, read);
             return (int)read;
@@ -399,6 +434,14 @@ namespace SharpZebra.Printing
         internal static extern bool CloseHandle(IntPtr hObject);
 
         #endregion CloseHandle
+
+        #region CancelIo
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool CancelIo(IntPtr hFile);
+
+        #endregion CancelIo
 
         #region GetOverlappedResult
 
