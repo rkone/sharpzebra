@@ -37,6 +37,26 @@ public partial class SpoolPrinter(PrinterSettings settings) : IZebraPrinter
             return Task.FromResult(res ?? false);
         }
 
+        /// <summary>
+        /// Not supported: the Windows print spooler is one-way and cannot return data from the printer.
+        /// Use NetworkPrinter or USBPrinter to query a printer.
+        /// </summary>
+        /// <exception cref="NotSupportedException">Always</exception>
+        public byte[] Query(byte[] data, int timeoutMilliseconds = 5000)
+        {
+            throw new NotSupportedException("The Windows print spooler cannot return data from the printer. Use NetworkPrinter or USBPrinter to query a printer.");
+        }
+
+        /// <summary>
+        /// Not supported: the Windows print spooler is one-way and cannot return data from the printer.
+        /// Use NetworkPrinter or USBPrinter to query a printer.
+        /// </summary>
+        /// <exception cref="NotSupportedException">Always</exception>
+        public Task<byte[]> QueryAsync(byte[] data, int timeoutMilliseconds = 5000)
+        {
+            throw new NotSupportedException("The Windows print spooler cannot return data from the printer. Use NetworkPrinter or USBPrinter to query a printer.");
+        }
+
     // Structure and API declarations:
     [StructLayout(LayoutKind.Sequential)]
     private struct DOCINFOA

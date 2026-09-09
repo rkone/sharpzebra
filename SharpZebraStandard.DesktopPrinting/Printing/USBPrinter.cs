@@ -32,6 +32,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SharpZebra.Printing;
@@ -69,6 +70,49 @@ public class USBPrinter(PrinterSettings settings) : IZebraPrinter
         {
             var res = Print(data);
             return Task.FromResult(res ?? false);
+        }
+
+        /// <summary>
+        /// Sends data to the printer and returns whatever the printer sends back, for host commands such as
+        /// ^HW (directory listing) or ~HS (status). Reading stops once the printer has replied and then been quiet
+        /// for half a second, or when the timeout passes with no reply.
+        /// </summary>
+        /// <param name="data">The EPL2/ZPLII bytes to send</param>
+        /// <param name="timeoutMilliseconds">How long to wait for the printer to start replying</param>
+        /// <returns>The raw response bytes, or null if the printer could not be opened or did not reply in time</returns>
+        public byte[] Query(byte[] data, int timeoutMilliseconds = 5000)
+        {
+            const int idleTimeoutMilliseconds = 500;
+            var connector = new UsbPrinterConnector(Settings.PrinterName);
+            if (!connector.BeginSend() || connector.Send(data, 0, data.Length) != data.Length)
+                return null;
+
+            var response = new MemoryStream();
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMilliseconds);
+            connector.ReadTimeout = idleTimeoutMilliseconds;
+            while (true)
+            {
+                var read = connector.Read(out var buffer);
+                if (read > 0)
+                {
+                    response.Write(buffer, 0, read);
+                    continue;
+                }
+                // Nothing arrived within one idle period: done if the printer already replied, or if we've waited long enough
+                if (response.Length > 0 || DateTime.UtcNow >= deadline) break;
+            }
+            return response.Length == 0 ? null : response.ToArray();
+        }
+
+        /// <summary>
+        /// Sends data to the printer and returns whatever the printer sends back. The underlying USB I/O is synchronous, so this simply wraps Query.
+        /// </summary>
+        /// <param name="data">The EPL2/ZPLII bytes to send</param>
+        /// <param name="timeoutMilliseconds">How long to wait for the printer to start replying</param>
+        /// <returns>The raw response bytes, or null if the printer could not be opened or did not reply in time</returns>
+        public Task<byte[]> QueryAsync(byte[] data, int timeoutMilliseconds = 5000)
+        {
+            return Task.FromResult(Query(data, timeoutMilliseconds));
         }
     }
 
@@ -219,25 +263,25 @@ public class UsbPrinterConnector
         }
     }
 
-        /// <summary>
-        /// Opens the connection to the USB printer.
-        /// </summary>
-        /// <returns>True if the printer is online and the connection was opened, false otherwise</returns>
-        public bool BeginSend()
-        {
-            return GetConnected();
-        }
+    /// <summary>
+    /// Opens the connection to the USB printer.
+    /// </summary>
+    /// <returns>True if the printer is online and the connection was opened, false otherwise</returns>
+    public bool BeginSend()
+    {
+        return GetConnected();
+    }
 
-        /// <summary>
-        /// Writes data to the USB printer, splitting it into 4096-byte blocks as required by USB 1.1.
-        /// </summary>
-        /// <param name="buffer">Data to send</param>
-        /// <param name="offset">Offset into the buffer to start sending from</param>
-        /// <param name="count">Number of bytes to send</param>
-        /// <returns>The number of bytes actually written</returns>
-        public int Send(byte[] buffer, int offset, int count)
-        {
-            // USB 1.1 WriteFile maximum block size is 4096
+    /// <summary>
+    /// Writes data to the USB printer, splitting it into 4096-byte blocks as required by USB 1.1.
+    /// </summary>
+    /// <param name="buffer">Data to send</param>
+    /// <param name="offset">Offset into the buffer to start sending from</param>
+    /// <param name="count">Number of bytes to send</param>
+    /// <returns>The number of bytes actually written</returns>
+    public int Send(byte[] buffer, int offset, int count)
+    {
+        // USB 1.1 WriteFile maximum block size is 4096
 
         if (!GetConnected())
             throw new ApplicationException("Not connected");
