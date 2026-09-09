@@ -6,7 +6,7 @@
     <Authors>rkone</Authors>
     <Description>Print to networked Zebra label printers using EPL2/ZPL (without needing to know EPL2 or ZPL)</Description>
     <Version>1.2.0</Version>
-    <PackageReleaseNotes>v1.2.0: Added FontStore to upload TrueType (.TTF) fonts to the printer, and FontDelete to remove them.</PackageReleaseNotes>
+    <PackageReleaseNotes>v1.2.0: Added FontStore to upload TrueType (.TTF) fonts to the printer, and FontDelete to remove them. Added Query and QueryAsync to IZebraPrinter to read replies from the printer (NetworkPrinter; not supported by SpoolPrinter). Added DirectoryList to list the files on a printer drive and HostStatus to read the printer's state (paper out, paused, head up, ribbon out, print mode and more). Network queries apply the timeout to connecting as well as reading.</PackageReleaseNotes>
 	<PackageReadmeFile>readme.md</PackageReadmeFile>
     <RootNamespace>SharpZebra</RootNamespace>
     <SignAssembly>true</SignAssembly>

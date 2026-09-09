@@ -4,7 +4,7 @@
     <TargetFramework>net20</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.2.0</Version>
-    <PackageReleaseNotes>v1.2.0: Added FontStore to upload TrueType (.TTF) fonts to the printer, and FontDelete to remove them.</PackageReleaseNotes>
+    <PackageReleaseNotes>v1.2.0: Added FontStore to upload TrueType (.TTF) fonts to the printer, and FontDelete to remove them. Added Query to IZebraPrinter to read replies from the printer (NetworkPrinter and USBPrinter; not supported by SpoolPrinter). Added DirectoryList to list the files on a printer drive and HostStatus to read the printer's state (paper out, paused, head up, ribbon out, print mode and more). Network queries apply the timeout to connecting as well as reading, and USB reads no longer block when the printer does not reply.</PackageReleaseNotes>
     <PackageId>SharpZebra.rkone</PackageId>
     <Authors>rkone</Authors>
     <Company>rkone</Company>

@@ -18,7 +18,7 @@
     <Product>SharpZebraStandard.DesktopPrinting</Product>
     <Description>Adds printing to USB and Spool (shared network) Zebra label printers</Description>
     <PackageTags>Zebra Printer Barcode Label</PackageTags>
-    <PackageReleaseNotes>Converted to .NET 10</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.0.0: Converted to .NET 10 with LibraryImport source-generated interop. Added Query and QueryAsync so USBPrinter can read replies from the printer (used by DirectoryList and HostStatus); SpoolPrinter throws NotSupportedException for these because the spooler is one way. USB reads no longer block when the printer does not reply.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
