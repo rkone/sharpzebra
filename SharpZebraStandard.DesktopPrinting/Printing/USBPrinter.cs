@@ -339,12 +339,14 @@ public class UsbPrinterConnector
 
         if (!FileIO.ReadFile(_usbHandle, _readBuffer, ReadBufferSize, out var read, ref ov))
         {
-            if (Marshal.GetLastWin32Error() == FileIO.ERROR_IO_PENDING)
-                sg.WaitOne(ReadTimeout, false);
-            else
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            var error = Marshal.GetLastWin32Error();
+            if (error != FileIO.ERROR_IO_PENDING)
+                throw new Win32Exception(error);
+            if (!sg.WaitOne(ReadTimeout, false))
+                FileIO.CancelIo(_usbHandle); // nothing arrived in time: abandon the read so GetOverlappedResult returns instead of blocking
         }
-        FileIO.GetOverlappedResult(_usbHandle, ref ov, out read, true);
+        if (!FileIO.GetOverlappedResult(_usbHandle, ref ov, out read, true))
+            read = 0; // cancelled
         buffer = new byte[read];
         Array.Copy(_readBuffer, buffer, read);
         return (int)read;
@@ -443,6 +445,14 @@ internal static partial class FileIO
     internal static partial bool CloseHandle(IntPtr hObject);
 
     #endregion CloseHandle
+
+    #region CancelIo
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool CancelIo(IntPtr hFile);
+
+    #endregion CancelIo
 
     #region GetOverlappedResult
 
