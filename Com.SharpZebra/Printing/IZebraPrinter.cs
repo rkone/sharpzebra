@@ -3,7 +3,18 @@ namespace SharpZebra.Printing
     public interface IZebraPrinter
     {
         bool? Print(byte[] data);
-        PrinterSettings Settings { get; set; }     
+
+        /// <summary>
+        /// Sends data to the printer and returns whatever the printer sends back, for host commands such as
+        /// ^HW (directory listing) or ~HS (status). Reading stops once the printer has replied and gone quiet.
+        /// </summary>
+        /// <param name="data">The EPL2/ZPLII bytes to send</param>
+        /// <param name="timeoutMilliseconds">How long to wait for the printer to connect and start replying</param>
+        /// <returns>The raw response bytes, or null if the printer could not be reached or did not reply in time</returns>
+        /// <exception cref="System.NotSupportedException">This printer type cannot return data (SpoolPrinter)</exception>
+        byte[] Query(byte[] data, int timeoutMilliseconds = 5000);
+
+        PrinterSettings Settings { get; set; }
     }
 
     public class PrinterSettings
